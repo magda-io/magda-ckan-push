@@ -1,6 +1,6 @@
 {
-  "name": "@magda/minion-ckan-sync",
-  "description": "MAGDA Ckan Sync Minion",
+  "name": "@magda/minion-ckan-push",
+  "description": "MAGDA Minion for pushing to Ckan",
   "version": "0.0.57-0",
   "scripts": {
     "prebuild": "rimraf dist tsconfig.tsbuildinfo",
@@ -15,7 +15,7 @@
     "test": "mocha --compilers ts:ts-node/register,tsx:ts-node/register --require tsconfig-paths/register \"src/test/**/*.spec.ts\"",
     "retag-and-push": "retag-and-push"
   },
-  "author": "",
+  "author": "CSIRO's Data61",
   "license": "Apache-2.0",
   "devDependencies": {
     "@magda/scripts": "^0.0.57-0",
