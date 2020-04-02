@@ -1,7 +1,7 @@
 apiVersion: extensions/v1beta1
 kind: Deployment
 metadata:
-  name: minion-ckan-sync
+  name: magda-minion-ckan-publisher
 spec:
   replicas: 1
   strategy:
@@ -10,10 +10,10 @@ spec:
   template:
     metadata:
       labels:
-        service: minion-ckan-sync
+        service: magda-minion-ckan-publisher
     spec:
       containers:
-      - name: minion-ckan-sync
+      - name: magda-minion-ckan-publisher
         image: {{ template "dockerimage" . }}
         imagePullPolicy: {{ .Values.image.pullPolicy | default .Values.global.image.pullPolicy }}
 {{- if .Values.global.enableLivenessProbes }}
@@ -43,7 +43,7 @@ spec:
         - name: USER_ID
           value: {{ .Values.global.defaultAdminUserId }}
         - name: INTERNAL_URL
-          value: "http://minion-ckan-sync"
+          value: "http://magda-minion-ckan-publisher"
         - name: JWT_SECRET
           valueFrom:
             secretKeyRef:

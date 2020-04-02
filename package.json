@@ -1,5 +1,5 @@
 {
-  "name": "@magda/minion-ckan-push",
+  "name": "@magda/magda-minion-ckan-publisher",
   "description": "MAGDA Minion for pushing to Ckan",
   "version": "0.0.57-0",
   "scripts": {
@@ -42,7 +42,7 @@
   "config": {
     "registryUrl": "http://localhost:6101/v0",
     "docker": {
-      "name": "data61/magda-minion-ckan-sync",
+      "name": "data61/magda-minion-ckan-publisher",
       "include": "node_modules dist Dockerfile"
     },
     "jwtSecret": "squirrel",
