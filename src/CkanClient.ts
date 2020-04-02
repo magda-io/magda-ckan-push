@@ -1,8 +1,7 @@
-import fetch from "isomorphic-fetch";
-import shortId from "shortid";
+const fetch = require("isomorphic-fetch");
+const shortId = require("shortid");
 import { v4 as uuidv4 } from "uuid";
-
-const URI =  require("urijs").default;
+const URI =  require("urijs");
 
 interface PlainObjectType {
     [key: string]: any;

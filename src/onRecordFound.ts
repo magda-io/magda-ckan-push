@@ -1,9 +1,11 @@
-import _ from "lodash";
-import { Record } from "magda-typescript-common/src/generated/registry/api";
-import AuthorizedRegistryClient from "magda-typescript-common/src/registry/AuthorizedRegistryClient";
-import CkanClient from "magda-typescript-common/src/CkanClient";
+import {
+    AuthorizedRegistryClient,
+    Record
+} from "@magda/minion-sdk";
+import CkanClient from "./CkanClient";
 import ckanSyncAspectDef from "./ckanSyncAspectDef";
-import URI from "urijs";
+const URI =  require("urijs").default;
+// const _ = require("lodash");
 
 interface PlainObjectType {
     [key: string]: any;

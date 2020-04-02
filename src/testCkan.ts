@@ -1,4 +1,4 @@
-import CkanClient from "magda-typescript-common/src/CkanClient";
+import CkanClient from "./CkanClient";
 
 const client = new CkanClient(
     "https://demo.ckan.org",

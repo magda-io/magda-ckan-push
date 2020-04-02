@@ -1,9 +1,9 @@
-import minion from "magda-minion-framework/src/index";
+import minion, { commonYargs } from "@magda/minion-sdk";
 import ckanSyncAspectDef from "./ckanSyncAspectDef";
 import onRecordFound from "./onRecordFound";
-import commonYargs from "magda-minion-framework/src/commonYargs";
-import CkanClient from "magda-typescript-common/src/CkanClient";
-import partial from "lodash/partial";
+import CkanClient from "./CkanClient";
+
+const partial = require("lodash/partial").default;
 
 const ID = "minion-ckan-sync";
 const argv = commonYargs(6121, "http://localhost:6121", argv =>
