@@ -5,7 +5,7 @@
   "scripts": {
     "prebuild": "rimraf dist tsconfig.tsbuildinfo",
     "build": "yarn run compile",
-    "compile": "tsc -b && ts-module-alias-transformer dist",
+    "compile": "tsc -b",
     "watch": "tsc -b --watch",
     "start": "node dist/index.js",
     "dev": "run-typescript-in-nodemon src/index.ts",
@@ -13,12 +13,14 @@
     "docker-build-local": "create-docker-context-for-node-component --build --push --tag auto --local",
     "docker-build-prod": "create-docker-context-for-node-component --build --push --tag auto",
     "test": "mocha --compilers ts:ts-node/register,tsx:ts-node/register --require tsconfig-paths/register \"src/test/**/*.spec.ts\"",
-    "retag-and-push": "retag-and-push"
+    "retag-and-push": "retag-and-push",
+    "helm-lint": "helm lint deploy/minion-linked-data-rating -f deploy/test-deploy.yaml"
   },
   "author": "CSIRO's Data61",
   "license": "Apache-2.0",
   "devDependencies": {
     "@magda/scripts": "^0.0.57-0",
+    "@magda/typescript-common": "^0.0.57-0",
     "@types/chai": "^4.0.4",
     "@types/lodash": "^4.14.74",
     "@types/mocha": "^2.2.42",
@@ -34,9 +36,13 @@
   },
   "dependencies": {
     "@magda/minion-framework": "^0.0.57-0",
+    "@magda/minion-sdk": "^0.0.57-0-beta-3",
     "@magda/registry-aspects": "^0.0.57-0",
-    "@magda/typescript-common": "^0.0.57-0",
+    "@types/isomorphic-fetch": "^0.0.35",
+    "@types/shortid": "^0.0.29",
+    "@types/uuid": "^7.0.2",
     "lodash": "^4.17.4",
+    "shortid": "^2.2.15",
     "urijs": "^1.19.2"
   },
   "config": {
