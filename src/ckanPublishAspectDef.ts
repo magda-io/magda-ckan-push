@@ -1,5 +1,5 @@
 export default {
     id: "ckan-publisher",
-    name: "Ckan Synchronisation Information",
-    jsonSchema: require("./ckan-sync.schema.json")
+    name: "Ckan Publishing Information",
+    jsonSchema: require("./ckan-publish.schema.json")
 };

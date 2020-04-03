@@ -3,7 +3,7 @@ import {
     Record
 } from "@magda/minion-sdk";
 import CkanClient from "./CkanClient";
-import ckanSyncAspectDef from "./ckanSyncAspectDef";
+import ckanPublishAspectDef from "./ckanPublishAspectDef";
 const URI =  require("urijs").default;
 // const _ = require("lodash");
 
@@ -11,30 +11,30 @@ interface PlainObjectType {
     [key: string]: any;
 }
 
-export interface CkanSyncAspectType {
+export interface CkanPublishAspectType {
     status: "retain" | "withdraw";
-    syncUserId?: string;
+    publishingUserId?: string;
     ckanId?: string;
     hasCreated: boolean;
-    syncRequired: boolean;
-    syncAttempted: boolean;
-    lastSyncAttemptTime?: string;
-    syncError?: string;
+    publishRequired: boolean;
+    publishAttempted: boolean;
+    lastPublishAttemptTime?: string;
+    publishError?: string;
 }
 
-async function recordSuccessCkanSyncAction(
+async function recordSuccessCkanPublishAction(
     recordId: string,
     tenantId: number,
     registry: AuthorizedRegistryClient,
-    ckanSyncData: CkanSyncAspectType,
+    ckanPublishData: CkanPublishAspectType,
     ckanId?: string
 ) {
-    const data: CkanSyncAspectType = {
-        ...ckanSyncData,
-        syncRequired: false,
-        syncAttempted: true,
-        lastSyncAttemptTime: new Date().toISOString(),
-        syncError: ""
+    const data: CkanPublishAspectType = {
+        ...ckanPublishData,
+        publishRequired: false,
+        publishAttempted: true,
+        lastPublishAttemptTime: new Date().toISOString(),
+        publishError: ""
     };
     if (ckanId) {
         data.ckanId = ckanId;
@@ -45,7 +45,7 @@ async function recordSuccessCkanSyncAction(
     }
     const res = await registry.putRecordAspect(
         recordId,
-        ckanSyncAspectDef.id,
+        ckanPublishAspectDef.id,
         data,
         tenantId
     );
@@ -54,22 +54,22 @@ async function recordSuccessCkanSyncAction(
     }
 }
 
-async function recordFailCkanSyncAction(
+async function recordFailCkanPublishAction(
     recordId: string,
     tenantId: number,
     registry: AuthorizedRegistryClient,
-    ckanSyncData: CkanSyncAspectType,
+    ckanPublishData: CkanPublishAspectType,
     error: Error | string
 ) {
-    const data: CkanSyncAspectType = {
-        ...ckanSyncData,
-        syncAttempted: true,
-        lastSyncAttemptTime: new Date().toISOString(),
-        syncError: `${error}`
+    const data: CkanPublishAspectType = {
+        ...ckanPublishData,
+        publishAttempted: true,
+        lastPublishAttemptTime: new Date().toISOString(),
+        publishError: `${error}`
     };
     const res = await registry.putRecordAspect(
         recordId,
-        ckanSyncAspectDef.id,
+        ckanPublishAspectDef.id,
         data,
         tenantId
     );
@@ -158,7 +158,7 @@ async function createCkanDistributionsFromDataset(
     record: Record
 ): Promise<PlainObjectType[]> {
     // --- creating resources
-    // --- to do: sync resource by id
+    // --- to do: publish resource by id
     if (record?.aspects?.["dataset-distributions"]?.["distributions"].length) {
         const distributions = record?.aspects?.["dataset-distributions"]?.[
             "distributions"
@@ -333,7 +333,7 @@ export default async function onRecordFound(
             record.id,
             ["dcat-dataset-strings"],
             [
-                "ckan-sync",
+                "ckan-publish",
                 "dataset-distributions",
                 "temporal-coverage",
                 "dataset-publisher",
@@ -346,61 +346,61 @@ export default async function onRecordFound(
             throw recordData;
         }
 
-        const ckanSyncData = record.aspects["ckan-sync"] as CkanSyncAspectType;
-        if (!ckanSyncData) {
+        const ckanPublishData = record.aspects["ckan-publish"] as CkanPublishAspectType;
+        if (!ckanPublishData) {
             console.log(
-                "The dataset record has no ckan-sync aspect. Ignore webhook request."
+                "The dataset record has no ckan-publish aspect. Ignore webhook request."
             );
             return;
         }
 
-        if (!ckanSyncData.syncRequired) {
+        if (!ckanPublishData.publishRequired) {
             console.log(
-                `Ignore as no sync is required for dataset ${recordData.id}: `,
-                ckanSyncData
+                `Ignore as no publish is required for dataset ${recordData.id}: `,
+                ckanPublishData
             );
             return;
         }
 
-        console.log("Sync is required for: ", ckanSyncData);
+        console.log("Publishing is required for: ", ckanPublishData);
 
-        if (ckanSyncData.status === "withdraw") {
-            if (!ckanSyncData.hasCreated || !ckanSyncData.ckanId) {
+        if (ckanPublishData.status === "withdraw") {
+            if (!ckanPublishData.hasCreated || !ckanPublishData.ckanId) {
                 return;
             }
-            const pkgData = await ckanClient.getPackage(ckanSyncData.ckanId);
+            const pkgData = await ckanClient.getPackage(ckanPublishData.ckanId);
             if (pkgData) {
                 try {
                     await ckanClient.callCkanFunc("package_delete", {
-                        id: ckanSyncData.ckanId
+                        id: ckanPublishData.ckanId
                     });
                 } catch (e) {
-                    await recordFailCkanSyncAction(
+                    await recordFailCkanPublishAction(
                         recordData.id,
                         tenantId,
                         registry,
-                        ckanSyncData,
+                        ckanPublishData,
                         e
                     );
                 }
             }
 
-            await recordSuccessCkanSyncAction(
+            await recordSuccessCkanPublishAction(
                 recordData.id,
                 tenantId,
                 registry,
-                ckanSyncData
+                ckanPublishData
             );
-        } else if (ckanSyncData.status === "retain") {
+        } else if (ckanPublishData.status === "retain") {
             let ckanId: string;
             let error: Error;
             try {
-                if (ckanSyncData.hasCreated && ckanSyncData.ckanId) {
+                if (ckanPublishData.hasCreated && ckanPublishData.ckanId) {
                     const pkgData = await ckanClient.getPackage(
-                        ckanSyncData.ckanId
+                        ckanPublishData.ckanId
                     );
                     if (pkgData) {
-                        ckanId = ckanSyncData.ckanId;
+                        ckanId = ckanPublishData.ckanId;
                         await updateCkanPackage(
                             ckanClient,
                             ckanId,
@@ -426,24 +426,24 @@ export default async function onRecordFound(
             }
 
             if (error) {
-                await recordFailCkanSyncAction(
+                await recordFailCkanPublishAction(
                     recordData.id,
                     tenantId,
                     registry,
-                    ckanSyncData,
+                    ckanPublishData,
                     error
                 );
             } else {
-                await recordSuccessCkanSyncAction(
+                await recordSuccessCkanPublishAction(
                     recordData.id,
                     tenantId,
                     registry,
-                    ckanSyncData,
+                    ckanPublishData,
                     ckanId
                 );
             }
         } else {
-            throw new Error(`Unknow ckan sync status: ${ckanSyncData.status}`);
+            throw new Error(`Unknow ckan publish status: ${ckanPublishData.status}`);
         }
     } catch (e) {
         console.error(
