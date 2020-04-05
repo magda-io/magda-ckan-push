@@ -6,7 +6,7 @@ import CkanClient from "./CkanClient";
 const partial = require("lodash/partial");
 
 const ID = "minion-ckan-publish";
-const argv = commonYargs(6121, "http://localhost:6121", argv =>
+const argv = commonYargs(6122, "http://localhost:6122", argv =>
     argv
         .option("ckanServerUrl", {
             describe: "the ckan server URL",
