@@ -24,8 +24,8 @@ jobs:
       - name: helm-check
         uses: igabaydulin/helm-check-action@0.1.4
         env:
-          CHART_LOCATION: ./deploy/magda-minion-ckan-publisher
-          CHART_VALUES: ./deploy/test-deploy.yaml
+          CHART_LOCATION: ./deploy/helm/magda-minion-ckan-publisher
+          CHART_VALUES: ./deploy/helm/magda-minion-ckan-publisher/test-deploy.yaml
 
       - name: Login to GitHub Package Repository
         env:
