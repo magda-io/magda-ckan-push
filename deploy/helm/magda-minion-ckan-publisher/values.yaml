@@ -1,10 +1,30 @@
-image: {}
+image:
+  name: "magda-minion-linked-data-rating"
+  # repository:
+  # tag:
+  # pullPolicy:
+  # imagePullSecret:
+
+global:
+  image: {}
+  rollingUpdate:
+    maxUnavailable: 0
+  minions:
+    image: {}
+
 resources:
   requests:
     cpu: 10m
     memory: 30Mi
   limits:
     cpu: 100m
+
+defaultImage:
+  repository: docker.io/data61
+  tag: 0.0.57-0
+  pullPolicy: IfNotPresent
+  imagePullSecret: false
+
 # Ckan Server URL: e.g. https://demo.ckan.org
 #ckanServerUrl: https://demo.ckan.org
 # Ckan default API key: e.g. 1222-xxx-xxxx-xxxxx
