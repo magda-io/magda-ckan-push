@@ -14,7 +14,7 @@
     "docker-build-prod": "create-docker-context-for-node-component --build --push --tag auto",
     "test": "mocha --compilers ts:ts-node/register,tsx:ts-node/register --require tsconfig-paths/register \"src/test/**/*.spec.ts\"",
     "retag-and-push": "retag-and-push",
-    "helm-lint": "helm lint deploy/helm/magda-minion-ckan-publisher -f deploy/helm/magda-minion-ckan-publisher/test-deploy.yaml"
+    "helm-lint": "helm lint deploy/magda-minion-ckan-publisher -f deploy/magda-minion-ckan-publisher/test-deploy.yaml"
   },
   "author": "CSIRO's Data61",
   "license": "Apache-2.0",
