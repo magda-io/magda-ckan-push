@@ -1,4 +1,8 @@
-apiVersion: v1
+apiVersion: v2
 description: A Helm chart for Kubernetes
 name: magda-minion-ckan-publisher
-version: 0.0.57-0
+description: A Helm chart for Magda CKAN Publisher Minion
+version: "0.0.57-0"
+kubeVersion: ">= 1.14.0-0"
+home: "https://github.com/magda-io/magda-minion-ckan-publisher"
+sources: ["https://github.com/magda-io/magda-minion-ckan-publisher"]
