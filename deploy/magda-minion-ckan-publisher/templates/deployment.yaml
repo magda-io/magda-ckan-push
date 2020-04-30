@@ -59,6 +59,8 @@ spec:
               key: jwt-secret
         - name: CKAN_SERVER_URL
           value: {{ .Values.ckanServerUrl }}
+        - name: USER_ID
+          value: {{ .Values.global.defaultAdminUserId | default .Values.defaultAdminUserId }}
         - name: CKAN_DEFAULT_API_KEY
           value: {{ .Values.ckanDefaultAPIKey }}
         - name: EXTERNAL_URL

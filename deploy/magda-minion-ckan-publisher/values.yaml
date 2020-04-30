@@ -25,6 +25,8 @@ defaultImage:
   pullPolicy: IfNotPresent
   imagePullSecret: false
 
+defaultAdminUserId: "00000000-0000-4000-8000-000000000000"
+
 # Ckan Server URL: e.g. https://demo.ckan.org
 #ckanServerUrl: https://demo.ckan.org
 # Ckan default API key: e.g. 1222-xxx-xxxx-xxxxx
