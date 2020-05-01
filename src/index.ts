@@ -5,7 +5,7 @@ import CkanClient from "./CkanClient";
 
 const partial = require("lodash/partial");
 
-const ID = "minion-ckan-publish";
+const ID = "minion-ckan-publisher";
 const argv = commonYargs(6122, "http://localhost:6122", argv =>
     argv
         .option("ckanServerUrl", {
@@ -34,7 +34,7 @@ const argv = commonYargs(6122, "http://localhost:6122", argv =>
 );
 
 const ckanClient = new CkanClient(argv.ckanServerUrl, argv.defaultCkanAPIKey);
-
+console.log("New stuff");
 minion({
     argv,
     id: ID,
