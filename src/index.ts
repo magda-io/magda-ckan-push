@@ -34,7 +34,6 @@ const argv = commonYargs(6122, "http://localhost:6122", argv =>
 );
 
 const ckanClient = new CkanClient(argv.ckanServerUrl, argv.defaultCkanAPIKey);
-console.log("New stuff");
 minion({
     argv,
     id: ID,
