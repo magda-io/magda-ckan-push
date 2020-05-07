@@ -4,7 +4,7 @@ import {
 } from "@magda/minion-sdk";
 import CkanClient from "./CkanClient";
 import ckanPublishAspectDef from "./ckanPublishAspectDef";
-const URI =  require("urijs").default;
+import URI from "urijs";
 // const _ = require("lodash");
 
 interface PlainObjectType {
