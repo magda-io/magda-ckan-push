@@ -54,7 +54,7 @@
     },
     "jwtSecret": "squirrelsquirrelsquirrelsquirrel4s",
     "userId": "00000000-0000-4000-8000-000000000000",
-    "ckanAPIKey": "49f1bfa8-5fa5-4a96-97d9-c86d4e822f5c",
+    "ckanAPIKey": "2fbecb5d-dc63-45db-9a90-32a6c4a49e73",
     "ckanServerUrl": "https://demo.ckan.org",
     "externalUrl": "http://localhost"
   },
