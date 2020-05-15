@@ -29,6 +29,7 @@ async function recordSuccessCkanPublishAction(
     ckanPublishData: CkanPublishAspectType,
     ckanId?: string
 ) {
+    console.log("Recording success of publication");
     const data: CkanPublishAspectType = {
         ...ckanPublishData,
         publishRequired: false,
@@ -43,12 +44,14 @@ async function recordSuccessCkanPublishAction(
         data.ckanId = undefined;
         data.hasCreated = false;
     }
+    console.log("Here is the data that I'm putting in the record-aspects table: ", data);
     const res = await registry.putRecordAspect(
         recordId,
         ckanPublishAspectDef.id,
         data,
         tenantId
     );
+    console.log("Here is the result: ", res);
     if (res instanceof Error) {
         throw Error;
     }
@@ -265,17 +268,21 @@ async function createCkanPackage(
     record: Record,
     externalUrl: string
 ): Promise<string> {
+    console.log("Creating ckan package from dataset...")
     const data = await createCkanPackageDataFromDataset(
         ckanClient,
         externalUrl,
         record
     );
 
+    console.log("Done! Here is the data: ", data)
+    console.log("Now creating ckan distribution from dataset...")
     const distributions = await createCkanDistributionsFromDataset(
         ckanClient,
         externalUrl,
         record
     );
+    console.log("Done! Here are the distributions: ", distributions);
 
     if (distributions.length) {
         data.resources = distributions;
@@ -327,6 +334,7 @@ export default async function onRecordFound(
     record: Record,
     registry: AuthorizedRegistryClient
 ) {
+    console.log("\nstarting onRecordFound")
     try {
         const tenantId = record.tenantId;
         const recordData = await registry.getRecord(
@@ -341,12 +349,15 @@ export default async function onRecordFound(
             ],
             true
         );
-
+        console.log("before");
+        console.log("recordData: ", recordData);
         if (recordData instanceof Error) {
             throw recordData;
         }
+        console.log("after");
 
         const ckanPublishData = record.aspects["ckan-publish"] as CkanPublishAspectType;
+        console.log("\nRecord is : ", recordData);
         if (!ckanPublishData) {
             console.log(
                 "The dataset record has no ckan-publish aspect. Ignore webhook request."
@@ -362,13 +373,17 @@ export default async function onRecordFound(
             return;
         }
 
-        console.log("Publishing is required for: ", ckanPublishData);
+        console.log("Publishing is required. ckanPublishData: ", ckanPublishData);
+        console.log("record: ", record);
 
         if (ckanPublishData.status === "withdraw") {
+            console.log("withdrawing this.");
             if (!ckanPublishData.hasCreated || !ckanPublishData.ckanId) {
+                console.log("good news. it's not been created. or it doesn't have a ckanId. either way, nothing to do here.");
                 return;
             }
             const pkgData = await ckanClient.getPackage(ckanPublishData.ckanId);
+            console.log("withdrawing package. pkgData: ", pkgData);
             if (pkgData) {
                 try {
                     await ckanClient.callCkanFunc("package_delete", {
@@ -394,12 +409,16 @@ export default async function onRecordFound(
         } else if (ckanPublishData.status === "retain") {
             let ckanId: string;
             let error: Error;
+            console.log("Retaining record ", record.name)
             try {
                 if (ckanPublishData.hasCreated && ckanPublishData.ckanId) {
+                    console.log("it's been created and has an id")
                     const pkgData = await ckanClient.getPackage(
                         ckanPublishData.ckanId
                     );
+                    console.log("here is the pkgData: ", pkgData);
                     if (pkgData) {
+                        console.log("updating ckan package")
                         ckanId = ckanPublishData.ckanId;
                         await updateCkanPackage(
                             ckanClient,
@@ -408,6 +427,7 @@ export default async function onRecordFound(
                             externalUrl
                         );
                     } else {
+                        console.log("creating package in ckan")
                         ckanId = await createCkanPackage(
                             ckanClient,
                             recordData,
@@ -415,6 +435,7 @@ export default async function onRecordFound(
                         );
                     }
                 } else {
+                    console.log("package never existed. starting from scratch");
                     ckanId = await createCkanPackage(
                         ckanClient,
                         recordData,
@@ -426,6 +447,7 @@ export default async function onRecordFound(
             }
 
             if (error) {
+                console.log("Error while publishing: ", error)
                 await recordFailCkanPublishAction(
                     recordData.id,
                     tenantId,
@@ -434,6 +456,7 @@ export default async function onRecordFound(
                     error
                 );
             } else {
+                console.log("success while publishing")
                 await recordSuccessCkanPublishAction(
                     recordData.id,
                     tenantId,
@@ -443,13 +466,15 @@ export default async function onRecordFound(
                 );
             }
         } else {
+            // Shouldn't get here
             throw new Error(`Unknow ckan publish status: ${ckanPublishData.status}`);
         }
     } catch (e) {
         console.error(
-            `Error when process event for record ${
+            `Error occured when processing event for record ${
                 record.id
-            }: ${e} \n Record Data: ${JSON.stringify(record)}`
+            }: ${e}`
+            // \n Record Data: ${JSON.stringify(record)}`
         );
     }
 }
