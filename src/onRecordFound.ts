@@ -44,14 +44,14 @@ async function recordSuccessCkanPublishAction(
         data.ckanId = undefined;
         data.hasCreated = false;
     }
-    console.log("Here is the data that I'm putting in the record-aspects table: ", data);
+    // console.log("Here is the data that I'm putting in the record-aspects table: ", data);
     const res = await registry.putRecordAspect(
         recordId,
         ckanPublishAspectDef.id,
         data,
         tenantId
     );
-    console.log("Here is the result: ", res);
+    // console.log("Here is the result: ", res);
     if (res instanceof Error) {
         throw Error;
     }
@@ -258,8 +258,6 @@ async function createCkanPackageDataFromDataset(
         }
     }
 
-    console.log("creating package data: ", data);
-
     return data;
 }
 
@@ -275,14 +273,14 @@ async function createCkanPackage(
         record
     );
 
-    console.log("Done! Here is the data: ", data)
+    // console.log("Done! Here is the data: ", data)
     console.log("Now creating ckan distribution from dataset...")
     const distributions = await createCkanDistributionsFromDataset(
         ckanClient,
         externalUrl,
         record
     );
-    console.log("Done! Here are the distributions: ", distributions);
+    // console.log("Done! Here are the distributions: ", distributions);
 
     if (distributions.length) {
         data.resources = distributions;
@@ -349,15 +347,11 @@ export default async function onRecordFound(
             ],
             true
         );
-        console.log("before");
-        console.log("recordData: ", recordData);
         if (recordData instanceof Error) {
             throw recordData;
         }
-        console.log("after");
 
         const ckanPublishData = record.aspects["ckan-publish"] as CkanPublishAspectType;
-        console.log("\nRecord is : ", recordData);
         if (!ckanPublishData) {
             console.log(
                 "The dataset record has no ckan-publish aspect. Ignore webhook request."
@@ -373,8 +367,8 @@ export default async function onRecordFound(
             return;
         }
 
-        console.log("Publishing is required. ckanPublishData: ", ckanPublishData);
-        console.log("record: ", record);
+        // console.log("Publishing is required. ckanPublishData: ", ckanPublishData);
+        // console.log("record: ", record);
 
         if (ckanPublishData.status === "withdraw") {
             console.log("withdrawing this.");
@@ -383,7 +377,7 @@ export default async function onRecordFound(
                 return;
             }
             const pkgData = await ckanClient.getPackage(ckanPublishData.ckanId);
-            console.log("withdrawing package. pkgData: ", pkgData);
+            // console.log("withdrawing package. pkgData: ", pkgData);
             if (pkgData) {
                 try {
                     await ckanClient.callCkanFunc("package_delete", {
@@ -409,14 +403,14 @@ export default async function onRecordFound(
         } else if (ckanPublishData.status === "retain") {
             let ckanId: string;
             let error: Error;
-            console.log("Retaining record ", record.name)
+            // console.log("Retaining record ", record.name)
             try {
                 if (ckanPublishData.hasCreated && ckanPublishData.ckanId) {
                     console.log("it's been created and has an id")
                     const pkgData = await ckanClient.getPackage(
                         ckanPublishData.ckanId
                     );
-                    console.log("here is the pkgData: ", pkgData);
+                    // console.log("here is the pkgData: ", pkgData);
                     if (pkgData) {
                         console.log("updating ckan package")
                         ckanId = ckanPublishData.ckanId;
@@ -427,7 +421,6 @@ export default async function onRecordFound(
                             externalUrl
                         );
                     } else {
-                        console.log("creating package in ckan")
                         ckanId = await createCkanPackage(
                             ckanClient,
                             recordData,
