@@ -1,4 +1,4 @@
-import onRecordFound from "../onRecordFound";
+import onRecordFound, { CkanPublishAspectType } from "../onRecordFound";
 import {} from "mocha";
 import sinon from "sinon";
 import nock from "nock";
