@@ -429,7 +429,7 @@ describe("Magda ckan-publisher minion", function(this: Mocha.ISuiteCallbackConte
         it("Successful update", async () => {
             // If all the mocks are satisfied,
             // we can assume a successful creation of a ckan package
-            const newCkanPublishAspect = {
+            const newCkanPublishAspect: CkanPublishAspectType = {
                 hasCreated: true,
                 publishAttempted: true,
                 publishRequired: true,
