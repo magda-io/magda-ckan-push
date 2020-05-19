@@ -427,6 +427,42 @@ describe("Magda ckan-publisher minion", function(this: Mocha.ISuiteCallbackConte
         })
     });
 
+    describe("Updating a CKAN package", () => {
+        it("Successful update", async () => {
+            // If all the mocks are satisfied,
+            // we can assume a successful creation of a ckan package
+            const newCkanPublishAspect = {
+                hasCreated: true,
+                publishAttempted: true,
+                publishRequired: true,
+                status: "retain",
+                ckanId: "0",
+            };
+            var newTestRecord = testRecord;
+            newTestRecord.aspects["ckan-publish"] = newCkanPublishAspect;
+            newTestRecord.id = "ckan-publish-update-pkg-test-success"
+
+            registryScope
+                .get("/records/ckan-publish-update-pkg-test-success")
+                .query({
+                    "aspect": "dcat-dataset-strings",
+                    "dereference": true,
+                    "optionalAspect": [
+                        "ckan-publish", "dataset-distributions", "temporal-coverage", "dataset-publisher", "provenance"
+                    ],
+                })
+                .reply(200, newTestRecord);
+            registryScope
+                .put("/records/ckan-publish-update-pkg-test-success/aspects/ckan-publish")
+                .reply(200);
+            ckanScope
+                .post("/api/3/action/package_update")
+                .reply(200, createCkanResp(tokenCkanResponse));
+
+            await curriedOnRecordFound(newTestRecord, registry);
+        })
+    });
+
     // describe("licenses", () => {
     //     describe("endorsed by OKFN should get 1 star:", () => {
     //         OKFN_LICENSES.forEach((license: string) => {
