@@ -384,11 +384,11 @@ describe("Magda ckan-publisher minion", function(this: Mocha.ISuiteCallbackConte
     });
     
     beforeEach(() => {
-        registryScope = nock(registryUrl).log(console.log);
+        registryScope = nock(registryUrl);
         ckanScope = nock(CKAN_SERVER_URL, {
             reqheaders: {
                 authorization: CKAN_API_KEY,
-        }}).log(console.log);
+        }});
         ckanScope
             .post("/api/3/action/license_list")
             .reply(200, createCkanResp(ckanLicenseList));
