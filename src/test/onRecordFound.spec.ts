@@ -419,7 +419,8 @@ describe("Magda ckan-publisher minion", function(this: Mocha.ISuiteCallbackConte
             registryScope
                 .put("/records/ckan-publish-create-pkg-test-success/aspects/ckan-publish")
                 .reply(200);
-            ckanScope.post("/api/3/action/package_create")
+            ckanScope
+                .post("/api/3/action/package_create")
                 .reply(200, createCkanResp(tokenCkanResponse));
 
             await curriedOnRecordFound(testRecord, registry);
