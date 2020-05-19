@@ -8,7 +8,7 @@ import _ from "lodash";
 const partial = require("lodash/partial");
 
 import { AuthorizedRegistryClient } from "@magda/minion-sdk";
-const CKAN_SERVER_URL = 'http://demo.ckan.org'
+const CKAN_SERVER_URL = 'http://test.demo.ckan.org'
 const CKAN_API_KEY = '2fbecb5d-dc63-45db-9a90-32a6c4a49e73';
 const USER_ID = "b1fddd6f-e230-4068-bd2c-1a21844f1598";
 const ckanClient = new CkanClient(CKAN_SERVER_URL, CKAN_API_KEY);
