@@ -370,7 +370,7 @@ const testRecord = {
 }
 
 describe("Magda ckan-publisher minion", function(this: Mocha.ISuiteCallbackContext) {
-    this.timeout(5000);
+    this.timeout(10000);
     nock.disableNetConnect();
     let registryScope: nock.Scope;
     let ckanScope: nock.Scope;
