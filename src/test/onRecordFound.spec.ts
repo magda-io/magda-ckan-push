@@ -381,14 +381,16 @@ describe("Magda ckan-publisher minion", function(this: Mocha.ISuiteCallbackConte
     
     after(() => {
         (console.info as any).restore();
-        ckanScope.done();
     });
     
     beforeEach(() => {
-        console.log("registryScope is: ", registryScope);
-        registryScope = nock(registryUrl);
-        ckanScope = nock(CKAN_SERVER_URL).log(console.log);
-        ckanScope.post("/api/3/action/license_list")
+        registryScope = nock(registryUrl).log(console.log);
+        ckanScope = nock(CKAN_SERVER_URL, {
+            reqheaders: {
+                authorization: CKAN_API_KEY,
+        }}).log(console.log);
+        ckanScope
+            .post("/api/3/action/license_list")
             .reply(200, createCkanResp(ckanLicenseList));
     });
 
@@ -398,23 +400,30 @@ describe("Magda ckan-publisher minion", function(this: Mocha.ISuiteCallbackConte
         nock.cleanAll();
     });
 
-
     describe("Creating a CKAN package", () => {
-        // const record = buildRecordWithDist();
-        it("curried record", () => {
+        it("Successful creation", async () => {
+            // If all the mocks are satisfied,
+            // we can assume a successful creation of a ckan package
             registryScope
-                .get("/records/ckan-publish-create-pkg-test-success?aspect=dcat-dataset-strings&optionalAspect=ckan-publish&optionalAspect=dataset-distributions&optionalAspect=temporal-coverage&optionalAspect=dataset-publisher&optionalAspect=provenance&dereference=true")
+                .get("/records/ckan-publish-create-pkg-test-success")
+                .query({
+                    "aspect": "dcat-dataset-strings",
+                    "dereference": true,
+                    "optionalAspect": [
+                        "ckan-publish", "dataset-distributions", "temporal-coverage", "dataset-publisher", "provenance"
+                    ],
+                })
                 .reply(200, testRecord);
-            // registryScope
-            //     .post("/records/ckan-publish-create-pkg-test-success/aspects/ckan-publish")
-            //     .reply(200);
+            registryScope
+                .put("/records/ckan-publish-create-pkg-test-success/aspects/ckan-publish")
+                .reply(200);
             ckanScope
                 .post("/api/3/action/package_show")
                 .reply(200, {success: true, result: "yes"});
             ckanScope.post("/api/3/action/package_create")
                 .reply(200, createCkanResp(tokenCkanResponse));
-            // ckanScope.
-            return curriedOnRecordFound(testRecord, registry);
+
+            await curriedOnRecordFound(testRecord, registry);
         })
     });
 
