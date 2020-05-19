@@ -392,6 +392,9 @@ describe("Magda ckan-publisher minion", function(this: Mocha.ISuiteCallbackConte
         ckanScope
             .post("/api/3/action/license_list")
             .reply(200, createCkanResp(ckanLicenseList));
+        ckanScope
+            .post("/api/3/action/package_show")
+            .reply(200, {success: true, result: "yes"});
     });
 
     afterEach(() => {
@@ -417,9 +420,6 @@ describe("Magda ckan-publisher minion", function(this: Mocha.ISuiteCallbackConte
             registryScope
                 .put("/records/ckan-publish-create-pkg-test-success/aspects/ckan-publish")
                 .reply(200);
-            ckanScope
-                .post("/api/3/action/package_show")
-                .reply(200, {success: true, result: "yes"});
             ckanScope.post("/api/3/action/package_create")
                 .reply(200, createCkanResp(tokenCkanResponse));
 
