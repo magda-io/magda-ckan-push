@@ -2,7 +2,6 @@ import onRecordFound, { CkanPublishAspectType } from "../onRecordFound";
 import {} from "mocha";
 import sinon from "sinon";
 import nock from "nock";
-// import ckanPublishAspectDef from "./ckanPublishAspectDef";
 import CkanClient from "../CkanClient";
 import _ from "lodash";
 const partial = require("lodash/partial");
