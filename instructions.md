@@ -1,4 +1,4 @@
-# Developing and debugging the Magda CKAN Publishing Minion
+# Developing and debugging the Magda CKAN Export Minion
 
 ## Build
 
@@ -19,11 +19,11 @@ then symbol link
 ## How to link to magda-core
 
 Set a symbolic link in magda-core that points to the minion.
-Assuming that `magda` lives in `~/magda` and the minion lives in `~/magda-minion-ckan-publisher`,
+Assuming that `magda` lives in `~/magda` and the minion lives in `~/magda-minion-ckan-exporter`,
 you want to run:
 
 ```bash
-ln -s ~/magda-minion-ckan-publisher/deploy/magda-minion-ckan-publisher ~/magda/deploy/helm/magda/charts/magda-minion-ckan-publisher
+ln -s ~/magda-minion-ckan-exporter/deploy/magda-minion-ckan-exporter ~/magda/deploy/helm/magda/charts/magda-minion-ckan-exporter
 ```
 
 ### Building

@@ -1,5 +1,5 @@
 {
-  "name": "@magda/magda-minion-ckan-publisher",
+  "name": "@magda/magda-minion-ckan-exporter",
   "description": "MAGDA Minion for pushing to Ckan",
   "version": "0.0.57-0",
   "scripts": {
@@ -14,7 +14,7 @@
     "docker-build-prod": "create-docker-context-for-node-component --build --push --tag auto",
     "test": "mocha --compilers ts:ts-node/register,tsx:ts-node/register --require tsconfig-paths/register \"src/test/**/*.spec.ts\"",
     "retag-and-push": "retag-and-push",
-    "helm-lint": "helm lint deploy/magda-minion-ckan-publisher -f deploy/magda-minion-ckan-publisher/test-deploy.yaml"
+    "helm-lint": "helm lint deploy/magda-minion-ckan-exporter -f deploy/magda-minion-ckan-exporter/test-deploy.yaml"
   },
   "author": "CSIRO's Data61",
   "license": "Apache-2.0",
@@ -49,7 +49,7 @@
   "config": {
     "registryUrl": "http://localhost:6101/v0",
     "docker": {
-      "name": "data61/magda-minion-ckan-publisher",
+      "name": "data61/magda-minion-ckan-exporter",
       "include": "node_modules dist Dockerfile"
     },
     "jwtSecret": "squirrelsquirrelsquirrelsquirrel4s",

@@ -3,7 +3,7 @@ import {
     Record
 } from "@magda/minion-sdk";
 import CkanClient from "./CkanClient";
-import ckanPublishAspectDef from "./ckanPublishAspectDef";
+import ckanExportAspectDef from "./ckanExportAspectDef";
 import URI from "urijs";
 // const _ = require("lodash");
 
@@ -11,31 +11,31 @@ interface PlainObjectType {
     [key: string]: any;
 }
 
-export interface CkanPublishAspectType {
+export interface CkanExportAspectType {
     status: "retain" | "withdraw";
-    publishingUserId?: string;
+    exportUserId?: string;
     ckanId?: string;
     hasCreated: boolean;
-    publishRequired: boolean;
-    publishAttempted: boolean;
-    lastPublishAttemptTime?: string;
-    publishError?: string;
+    exportRequired: boolean;
+    exportAttempted: boolean;
+    lastExportAttemptTime?: string;
+    exportError?: string;
 }
 
-async function recordSuccessCkanPublishAction(
+async function recordSuccessCkanExportAction(
     recordId: string,
     tenantId: number,
     registry: AuthorizedRegistryClient,
-    ckanPublishData: CkanPublishAspectType,
+    ckanExportData: CkanExportAspectType,
     ckanId?: string
 ) {
-    console.log("Recording success of publication");
-    const data: CkanPublishAspectType = {
-        ...ckanPublishData,
-        publishRequired: false,
-        publishAttempted: true,
-        lastPublishAttemptTime: new Date().toISOString(),
-        publishError: ""
+    console.log("Recording successful export");
+    const data: CkanExportAspectType = {
+        ...ckanExportData,
+        exportRequired: false,
+        exportAttempted: true,
+        lastExportAttemptTime: new Date().toISOString(),
+        exportError: ""
     };
     if (ckanId) {
         data.ckanId = ckanId;
@@ -47,7 +47,7 @@ async function recordSuccessCkanPublishAction(
     // console.log("Here is the data that I'm putting in the record-aspects table: ", data);
     const res = await registry.putRecordAspect(
         recordId,
-        ckanPublishAspectDef.id,
+        ckanExportAspectDef.id,
         data,
         tenantId
     );
@@ -57,22 +57,22 @@ async function recordSuccessCkanPublishAction(
     }
 }
 
-async function recordFailCkanPublishAction(
+async function recordFailCkanExportAction(
     recordId: string,
     tenantId: number,
     registry: AuthorizedRegistryClient,
-    ckanPublishData: CkanPublishAspectType,
+    ckanExportData: CkanExportAspectType,
     error: Error | string
 ) {
-    const data: CkanPublishAspectType = {
-        ...ckanPublishData,
-        publishAttempted: true,
-        lastPublishAttemptTime: new Date().toISOString(),
-        publishError: `${error}`
+    const data: CkanExportAspectType = {
+        ...ckanExportData,
+        exportAttempted: true,
+        lastExportAttemptTime: new Date().toISOString(),
+        exportError: `${error}`
     };
     const res = await registry.putRecordAspect(
         recordId,
-        ckanPublishAspectDef.id,
+        ckanExportAspectDef.id,
         data,
         tenantId
     );
@@ -161,7 +161,7 @@ async function createCkanDistributionsFromDataset(
     record: Record
 ): Promise<PlainObjectType[]> {
     // --- creating resources
-    // --- to do: publish resource by id
+    // --- to do: export resource by id
     if (record?.aspects?.["dataset-distributions"]?.["distributions"].length) {
         const distributions = record?.aspects?.["dataset-distributions"]?.[
             "distributions"
@@ -339,7 +339,7 @@ export default async function onRecordFound(
             record.id,
             ["dcat-dataset-strings"],
             [
-                "ckan-publish",
+                "ckan-export",
                 "dataset-distributions",
                 "temporal-coverage",
                 "dataset-publisher",
@@ -351,68 +351,68 @@ export default async function onRecordFound(
             throw recordData;
         }
 
-        const ckanPublishData = record.aspects["ckan-publish"] as CkanPublishAspectType;
-        if (!ckanPublishData) {
+        const ckanExportData = record.aspects["ckan-export"] as CkanExportAspectType;
+        if (!ckanExportData) {
             console.log(
-                "The dataset record has no ckan-publish aspect. Ignore webhook request."
+                "The dataset record has no ckan-export aspect. Ignore webhook request."
             );
             return;
         }
 
-        if (!ckanPublishData.publishRequired) {
+        if (!ckanExportData.exportRequired) {
             console.log(
-                `Ignore as no publish is required for dataset id ${recordData.id} and name ${recordData.name}. ckanPublishData `,
-                ckanPublishData
+                `Ignore as no export is required for dataset id ${recordData.id} and name ${recordData.name}. ckanExportData `,
+                ckanExportData
             );
             return;
         }
 
-        // console.log("Publishing is required. ckanPublishData: ", ckanPublishData);
+        // console.log("Exporting is required. ckanExportData: ", ckanExportData);
 
-        if (ckanPublishData.status === "withdraw") {
+        if (ckanExportData.status === "withdraw") {
             console.log("withdrawing this.");
-            if (!ckanPublishData.hasCreated || !ckanPublishData.ckanId) {
+            if (!ckanExportData.hasCreated || !ckanExportData.ckanId) {
                 console.log("good news. it's not been created. or it doesn't have a ckanId. either way, nothing to do here.");
                 return;
             }
-            const pkgData = await ckanClient.getPackage(ckanPublishData.ckanId);
+            const pkgData = await ckanClient.getPackage(ckanExportData.ckanId);
             // console.log("withdrawing package. pkgData: ", pkgData);
             if (pkgData) {
                 try {
                     await ckanClient.callCkanFunc("package_delete", {
-                        id: ckanPublishData.ckanId
+                        id: ckanExportData.ckanId
                     });
                 } catch (e) {
-                    await recordFailCkanPublishAction(
+                    await recordFailCkanExportAction(
                         recordData.id,
                         tenantId,
                         registry,
-                        ckanPublishData,
+                        ckanExportData,
                         e
                     );
                 }
             }
 
-            await recordSuccessCkanPublishAction(
+            await recordSuccessCkanExportAction(
                 recordData.id,
                 tenantId,
                 registry,
-                ckanPublishData
+                ckanExportData
             );
-        } else if (ckanPublishData.status === "retain") {
+        } else if (ckanExportData.status === "retain") {
             let ckanId: string;
             let error: Error;
             // console.log("Retaining record ", record.name)
             try {
-                if (ckanPublishData.hasCreated && ckanPublishData.ckanId) {
+                if (ckanExportData.hasCreated && ckanExportData.ckanId) {
                     console.log("it's been created and has an id")
                     const pkgData = await ckanClient.getPackage(
-                        ckanPublishData.ckanId
+                        ckanExportData.ckanId
                     );
                     // console.log("here is the pkgData: ", pkgData);
                     if (pkgData) {
                         console.log("updating ckan package")
-                        ckanId = ckanPublishData.ckanId;
+                        ckanId = ckanExportData.ckanId;
                         await updateCkanPackage(
                             ckanClient,
                             ckanId,
@@ -439,27 +439,27 @@ export default async function onRecordFound(
             }
 
             if (error) {
-                console.log("Error while publishing: ", error)
-                await recordFailCkanPublishAction(
+                console.log("Error while exporting: ", error)
+                await recordFailCkanExportAction(
                     recordData.id,
                     tenantId,
                     registry,
-                    ckanPublishData,
+                    ckanExportData,
                     error
                 );
             } else {
-                console.log("success while publishing")
-                await recordSuccessCkanPublishAction(
+                console.log("success while exporting")
+                await recordSuccessCkanExportAction(
                     recordData.id,
                     tenantId,
                     registry,
-                    ckanPublishData,
+                    ckanExportData,
                     ckanId
                 );
             }
         } else {
             // Shouldn't get here
-            throw new Error(`Unknow ckan publish status: ${ckanPublishData.status}`);
+            throw new Error(`Unknow ckan export status: ${ckanExportData.status}`);
         }
     } catch (e) {
         console.error(

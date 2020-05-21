@@ -1,3 +1,3 @@
-# magda-minion-ckan-publisher
+# magda-minion-ckan-exporter
 
-MAGDA Minion for publishing to CKAN
+MAGDA Minion for exporting datasets to CKAN

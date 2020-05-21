@@ -1,4 +1,4 @@
-import onRecordFound, { CkanPublishAspectType } from "../onRecordFound";
+import onRecordFound, { CkanExportAspectType } from "../onRecordFound";
 import { expect } from "chai";
 import sinon from "sinon";
 import nock from "nock";
@@ -329,10 +329,10 @@ tokenCkanResponse;
 
 const testRecord = {
     aspects:{
-        "ckan-publish":{
+        "ckan-export":{
             hasCreated: false,
-            publishAttempted: false,
-            publishRequired: true,
+            exportAttempted: false,
+            exportRequired: true,
             status: "retain"
         },
         "dcat-dataset-strings":{
@@ -363,12 +363,12 @@ const testRecord = {
             "distributions":["Array"]
         }
     },
-    id: "ckan-publish-create-pkg-test-success",
+    id: "ckan-export-create-pkg-test-success",
     name: "Mars Bar",
     tenantId: 0
 }
 
-describe("Magda ckan-publisher minion", function(this: Mocha.ISuiteCallbackContext) {
+describe("Magda ckan-exporter minion", function(this: Mocha.ISuiteCallbackContext) {
     this.timeout(10000);
     nock.disableNetConnect();
     let registryScope: nock.Scope;
@@ -399,17 +399,17 @@ describe("Magda ckan-publisher minion", function(this: Mocha.ISuiteCallbackConte
             // If all the mocks are satisfied,
             // we can assume a successful creation of a ckan package
             registryScope
-                .get("/records/ckan-publish-create-pkg-test-success")
+                .get("/records/ckan-export-create-pkg-test-success")
                 .query({
                     "aspect": "dcat-dataset-strings",
                     "dereference": true,
                     "optionalAspect": [
-                        "ckan-publish", "dataset-distributions", "temporal-coverage", "dataset-publisher", "provenance"
+                        "ckan-export", "dataset-distributions", "temporal-coverage", "dataset-publisher", "provenance"
                     ],
                 })
                 .reply(200, testRecord);
             registryScope
-                .put("/records/ckan-publish-create-pkg-test-success/aspects/ckan-publish")
+                .put("/records/ckan-export-create-pkg-test-success/aspects/ckan-export")
                 .reply(200);
             ckanScope
                 .post("/api/3/action/package_show")
@@ -427,29 +427,29 @@ describe("Magda ckan-publisher minion", function(this: Mocha.ISuiteCallbackConte
         it("Should not create", async () => {
             // If all the mocks are satisfied,
             // we can assume a successful creation of a ckan package
-            const newCkanPublishAspect: CkanPublishAspectType = {
+            const newCkanExportAspect: CkanExportAspectType = {
                 hasCreated: false,
-                publishAttempted: false,
-                publishRequired: false,
+                exportAttempted: false,
+                exportRequired: false,
                 status: "retain",
                 ckanId: "0",
             };
             var newTestRecord = testRecord;
-            newTestRecord.aspects["ckan-publish"] = newCkanPublishAspect;
-            newTestRecord.id = "ckan-publish-create-pkg-test-failure"
+            newTestRecord.aspects["ckan-export"] = newCkanExportAspect;
+            newTestRecord.id = "ckan-export-create-pkg-test-failure"
 
             registryScope
-                .get("/records/ckan-publish-create-pkg-test-failure")
+                .get("/records/ckan-export-create-pkg-test-failure")
                 .query({
                     "aspect": "dcat-dataset-strings",
                     "dereference": true,
                     "optionalAspect": [
-                        "ckan-publish", "dataset-distributions", "temporal-coverage", "dataset-publisher", "provenance"
+                        "ckan-export", "dataset-distributions", "temporal-coverage", "dataset-publisher", "provenance"
                     ],
                 })
                 .reply(200, newTestRecord);
             registryScope
-                .put("/records/ckan-publish-create-pkg-test-failure/aspects/ckan-publish")
+                .put("/records/ckan-export-create-pkg-test-failure/aspects/ckan-export")
                 .optionally()
                 .reply(500, () => {
                     expect.fail()
@@ -469,29 +469,29 @@ describe("Magda ckan-publisher minion", function(this: Mocha.ISuiteCallbackConte
         it("Successful update", async () => {
             // If all the mocks are satisfied,
             // we can assume a successful creation of a ckan package
-            const newCkanPublishAspect: CkanPublishAspectType = {
+            const newCkanExportAspect: CkanExportAspectType = {
                 hasCreated: true,
-                publishAttempted: true,
-                publishRequired: true,
+                exportAttempted: true,
+                exportRequired: true,
                 status: "retain",
                 ckanId: "0",
             };
             var newTestRecord = testRecord;
-            newTestRecord.aspects["ckan-publish"] = newCkanPublishAspect;
-            newTestRecord.id = "ckan-publish-update-pkg-test-success"
+            newTestRecord.aspects["ckan-export"] = newCkanExportAspect;
+            newTestRecord.id = "ckan-export-update-pkg-test-success"
 
             registryScope
-                .get("/records/ckan-publish-update-pkg-test-success")
+                .get("/records/ckan-export-update-pkg-test-success")
                 .query({
                     "aspect": "dcat-dataset-strings",
                     "dereference": true,
                     "optionalAspect": [
-                        "ckan-publish", "dataset-distributions", "temporal-coverage", "dataset-publisher", "provenance"
+                        "ckan-export", "dataset-distributions", "temporal-coverage", "dataset-publisher", "provenance"
                     ],
                 })
                 .reply(200, newTestRecord);
             registryScope
-                .put("/records/ckan-publish-update-pkg-test-success/aspects/ckan-publish")
+                .put("/records/ckan-export-update-pkg-test-success/aspects/ckan-export")
                 .reply(200);
             ckanScope
                 .post("/api/3/action/package_show")
@@ -509,29 +509,29 @@ describe("Magda ckan-publisher minion", function(this: Mocha.ISuiteCallbackConte
         it("Should not update", async () => {
             // If all the mocks are satisfied,
             // we can assume a successful creation of a ckan package
-            const newCkanPublishAspect: CkanPublishAspectType = {
+            const newCkanExportAspect: CkanExportAspectType = {
                 hasCreated: true,
-                publishAttempted: true,
-                publishRequired: false,
+                exportAttempted: true,
+                exportRequired: false,
                 status: "retain",
                 ckanId: "0",
             };
             var newTestRecord = testRecord;
-            newTestRecord.aspects["ckan-publish"] = newCkanPublishAspect;
-            newTestRecord.id = "ckan-publish-update-pkg-test-failure"
+            newTestRecord.aspects["ckan-export"] = newCkanExportAspect;
+            newTestRecord.id = "ckan-export-update-pkg-test-failure"
 
             registryScope
-                .get("/records/ckan-publish-update-pkg-test-failure")
+                .get("/records/ckan-export-update-pkg-test-failure")
                 .query({
                     "aspect": "dcat-dataset-strings",
                     "dereference": true,
                     "optionalAspect": [
-                        "ckan-publish", "dataset-distributions", "temporal-coverage", "dataset-publisher", "provenance"
+                        "ckan-export", "dataset-distributions", "temporal-coverage", "dataset-publisher", "provenance"
                     ],
                 })
                 .reply(200, newTestRecord);
             registryScope
-                .put("/records/ckan-publish-update-pkg-test-failure/aspects/ckan-publish")
+                .put("/records/ckan-export-update-pkg-test-failure/aspects/ckan-export")
                 .optionally()
                 .reply(500, () => {
                     expect.fail()
@@ -552,29 +552,29 @@ describe("Magda ckan-publisher minion", function(this: Mocha.ISuiteCallbackConte
             // If all the mocks are satisfied,
             // we can assume a successful creation of a ckan package
 
-            const newCkanPublishAspect: CkanPublishAspectType = {
+            const newCkanExportAspect: CkanExportAspectType = {
                 hasCreated: true,
-                publishAttempted: true,
-                publishRequired: true,
+                exportAttempted: true,
+                exportRequired: true,
                 status: "withdraw",
                 ckanId: "0",
             };
             var newTestRecord = testRecord;
-            newTestRecord.aspects["ckan-publish"] = newCkanPublishAspect;
-            newTestRecord.id = "ckan-publish-delete-pkg-test-success"
+            newTestRecord.aspects["ckan-export"] = newCkanExportAspect;
+            newTestRecord.id = "ckan-export-delete-pkg-test-success"
 
             registryScope
-                .get("/records/ckan-publish-delete-pkg-test-success")
+                .get("/records/ckan-export-delete-pkg-test-success")
                 .query({
                     "aspect": "dcat-dataset-strings",
                     "dereference": true,
                     "optionalAspect": [
-                        "ckan-publish", "dataset-distributions", "temporal-coverage", "dataset-publisher", "provenance"
+                        "ckan-export", "dataset-distributions", "temporal-coverage", "dataset-publisher", "provenance"
                     ],
                 })
                 .reply(200, newTestRecord);
             registryScope
-                .put("/records/ckan-publish-delete-pkg-test-success/aspects/ckan-publish")
+                .put("/records/ckan-export-delete-pkg-test-success/aspects/ckan-export")
                 .reply(200);
             ckanScope
                 .post("/api/3/action/package_show")
@@ -588,29 +588,29 @@ describe("Magda ckan-publisher minion", function(this: Mocha.ISuiteCallbackConte
         it("Should not delete", async () => {
             // If all the mocks are satisfied,
             // we can assume a successful creation of a ckan package
-            const newCkanPublishAspect: CkanPublishAspectType = {
+            const newCkanExportAspect: CkanExportAspectType = {
                 hasCreated: true,
-                publishAttempted: true,
-                publishRequired: false,
+                exportAttempted: true,
+                exportRequired: false,
                 status: "withdraw",
                 ckanId: "0",
             };
             var newTestRecord = testRecord;
-            newTestRecord.aspects["ckan-publish"] = newCkanPublishAspect;
-            newTestRecord.id = "ckan-publish-delete-pkg-test-failure"
+            newTestRecord.aspects["ckan-export"] = newCkanExportAspect;
+            newTestRecord.id = "ckan-export-delete-pkg-test-failure"
 
             registryScope
-                .get("/records/ckan-publish-delete-pkg-test-failure")
+                .get("/records/ckan-export-delete-pkg-test-failure")
                 .query({
                     "aspect": "dcat-dataset-strings",
                     "dereference": true,
                     "optionalAspect": [
-                        "ckan-publish", "dataset-distributions", "temporal-coverage", "dataset-publisher", "provenance"
+                        "ckan-export", "dataset-distributions", "temporal-coverage", "dataset-publisher", "provenance"
                     ],
                 })
                 .reply(200, newTestRecord);
             registryScope
-                .put("/records/ckan-publish-delete-pkg-test-failure/aspects/ckan-publish")
+                .put("/records/ckan-export-delete-pkg-test-failure/aspects/ckan-export")
                 .optionally()
                 .reply(500, () => {
                     expect.fail()

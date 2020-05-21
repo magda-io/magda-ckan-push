@@ -1,11 +1,11 @@
 import minion, { commonYargs } from "@magda/minion-sdk";
-import ckanPublishAspectDef from "./ckanPublishAspectDef";
+import ckanExportAspectDef from "./ckanExportAspectDef";
 import onRecordFound from "./onRecordFound";
 import CkanClient from "./CkanClient";
 
 const partial = require("lodash/partial");
 
-const ID = "minion-ckan-publisher";
+const ID = "minion-ckan-exporter";
 const argv = commonYargs(6122, "http://localhost:6122", argv =>
     argv
         .option("ckanServerUrl", {
@@ -17,7 +17,7 @@ const argv = commonYargs(6122, "http://localhost:6122", argv =>
         })
         .option("defaultCkanAPIKey", {
             describe:
-                "the default ckan server API key used if publish request users don't have a ckan account",
+                "the default ckan server API key used if export request users don't have a ckan account",
             type: "string",
             default:
                 process.env.CKAN_DEFAULT_API_KEY ||
@@ -37,9 +37,9 @@ const ckanClient = new CkanClient(argv.ckanServerUrl, argv.defaultCkanAPIKey);
 minion({
     argv,
     id: ID,
-    aspects: ["ckan-publish"],
+    aspects: ["ckan-export"],
     optionalAspects: [],
-    writeAspectDefs: [ckanPublishAspectDef],
+    writeAspectDefs: [ckanExportAspectDef],
     onRecordFound: partial(onRecordFound, ckanClient, argv.externalUrl)
 }).catch(e => {
     console.error("Error: " + e.message, e);

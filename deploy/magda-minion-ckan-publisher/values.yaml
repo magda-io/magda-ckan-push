@@ -1,5 +1,5 @@
 image:
-  name: "magda-minion-ckan-publisher"
+  name: "magda-minion-ckan-exporter"
   # repository:
   # tag:
   # pullPolicy:

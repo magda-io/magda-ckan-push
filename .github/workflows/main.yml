@@ -3,7 +3,7 @@ name: Main CI Workflow
 on: push
 
 env:
-  REPO_NAME: magda-minion-ckan-publisher
+  REPO_NAME: magda-minion-ckan-exporter
 
 jobs:
   build-test-docker:

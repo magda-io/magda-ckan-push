@@ -1,5 +1,5 @@
 export default {
-    id: "ckan-publish",
-    name: "Ckan Publishing Information",
-    jsonSchema: require("./ckan-publish.schema.json")
+    id: "ckan-export",
+    name: "Ckan Export Information",
+    jsonSchema: require("./ckan-export.schema.json")
 };
