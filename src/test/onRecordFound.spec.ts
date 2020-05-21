@@ -1,5 +1,5 @@
 import onRecordFound, { CkanPublishAspectType } from "../onRecordFound";
-import {} from "mocha";
+import { expect } from "chai";
 import sinon from "sinon";
 import nock from "nock";
 import CkanClient from "../CkanClient";
