@@ -361,14 +361,13 @@ export default async function onRecordFound(
 
         if (!ckanPublishData.publishRequired) {
             console.log(
-                `Ignore as no publish is required for dataset ${recordData.id}: `,
+                `Ignore as no publish is required for dataset id ${recordData.id} and name ${recordData.name}. ckanPublishData `,
                 ckanPublishData
             );
             return;
         }
 
         // console.log("Publishing is required. ckanPublishData: ", ckanPublishData);
-        // console.log("record: ", record);
 
         if (ckanPublishData.status === "withdraw") {
             console.log("withdrawing this.");
