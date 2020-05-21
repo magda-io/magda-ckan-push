@@ -508,7 +508,7 @@ describe("Magda ckan-publisher minion", function(this: Mocha.ISuiteCallbackConte
     });
 
     describe("Deleting a CKAN package", () => {
-        it.only("Successful deletion", async () => {
+        it("Successful deletion", async () => {
             // If all the mocks are satisfied,
             // we can assume a successful creation of a ckan package
 
