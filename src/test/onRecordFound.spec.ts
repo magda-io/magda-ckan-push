@@ -423,6 +423,46 @@ describe("Magda ckan-publisher minion", function(this: Mocha.ISuiteCallbackConte
 
             await curriedOnRecordFound(testRecord, registry);
         })
+
+        it("Should not create", async () => {
+            // If all the mocks are satisfied,
+            // we can assume a successful creation of a ckan package
+            const newCkanPublishAspect: CkanPublishAspectType = {
+                hasCreated: false,
+                publishAttempted: false,
+                publishRequired: false,
+                status: "retain",
+                ckanId: "0",
+            };
+            var newTestRecord = testRecord;
+            newTestRecord.aspects["ckan-publish"] = newCkanPublishAspect;
+            newTestRecord.id = "ckan-publish-create-pkg-test-failure"
+
+            registryScope
+                .get("/records/ckan-publish-create-pkg-test-failure")
+                .query({
+                    "aspect": "dcat-dataset-strings",
+                    "dereference": true,
+                    "optionalAspect": [
+                        "ckan-publish", "dataset-distributions", "temporal-coverage", "dataset-publisher", "provenance"
+                    ],
+                })
+                .reply(200, newTestRecord);
+            registryScope
+                .put("/records/ckan-publish-create-pkg-test-failure/aspects/ckan-publish")
+                .optionally()
+                .reply(500, () => {
+                    expect.fail()
+                });
+
+            ckanScope
+                .post("/api/3/action/package_create")
+                .optionally()
+                .reply(500, () => {
+                    expect.fail()
+                });
+            await curriedOnRecordFound(newTestRecord, registry);
+        })
     });
 
     describe("Updating a CKAN package", () => {
@@ -542,6 +582,46 @@ describe("Magda ckan-publisher minion", function(this: Mocha.ISuiteCallbackConte
             ckanScope.post("/api/3/action/package_delete")
                 .reply(200, createCkanResp(tokenCkanResponse));
 
+            await curriedOnRecordFound(newTestRecord, registry);
+        })
+
+        it("Should not delete", async () => {
+            // If all the mocks are satisfied,
+            // we can assume a successful creation of a ckan package
+            const newCkanPublishAspect: CkanPublishAspectType = {
+                hasCreated: true,
+                publishAttempted: true,
+                publishRequired: false,
+                status: "withdraw",
+                ckanId: "0",
+            };
+            var newTestRecord = testRecord;
+            newTestRecord.aspects["ckan-publish"] = newCkanPublishAspect;
+            newTestRecord.id = "ckan-publish-delete-pkg-test-failure"
+
+            registryScope
+                .get("/records/ckan-publish-delete-pkg-test-failure")
+                .query({
+                    "aspect": "dcat-dataset-strings",
+                    "dereference": true,
+                    "optionalAspect": [
+                        "ckan-publish", "dataset-distributions", "temporal-coverage", "dataset-publisher", "provenance"
+                    ],
+                })
+                .reply(200, newTestRecord);
+            registryScope
+                .put("/records/ckan-publish-delete-pkg-test-failure/aspects/ckan-publish")
+                .optionally()
+                .reply(500, () => {
+                    expect.fail()
+                });
+
+            ckanScope
+                .post("/api/3/action/package_delete")
+                .optionally()
+                .reply(500, () => {
+                    expect.fail()
+                });
             await curriedOnRecordFound(newTestRecord, registry);
         })
     });
