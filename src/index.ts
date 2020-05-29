@@ -25,7 +25,8 @@ const argv = commonYargs(6122, "http://localhost:6122", argv =>
         })
 );
 
-const ckanClient = new CkanClient(argv.ckanServerUrl, argv.defaultCkanAPIKey);
+const ckanServerApiKeyMap: any = argv.ckanServerKeyMap;
+
 minion({
     argv,
     id: ID,
