@@ -1,27 +1,19 @@
 import minion, { commonYargs } from "@magda/minion-sdk";
 import ckanExportAspectDef from "./ckanExportAspectDef";
-import onRecordFound from "./onRecordFound";
-import CkanClient from "./CkanClient";
+import onRecordFound, { CkanServerApiKeyMap } from "./onRecordFound";
 
 const partial = require("lodash/partial");
 
 const ID = "minion-ckan-exporter";
+const coerceJson = (path?: string) => path && require(path);
+
 const argv = commonYargs(6122, "http://localhost:6122", argv =>
     argv
-        .option("ckanServerUrl", {
-            describe: "the ckan server URL",
+        .option("ckanServerKeyMap", {
+            describe: "JSON File that contains CKAN server url to CKAN Api key mapping",
             type: "string",
-            default:
-                process.env.CKAN_SERVER_URL ||
-                process.env.npm_package_config_ckanServerUrl
-        })
-        .option("defaultCkanAPIKey", {
-            describe:
-                "the default ckan server API key used if export request users don't have a ckan account",
-            type: "string",
-            default:
-                process.env.CKAN_DEFAULT_API_KEY ||
-                process.env.npm_package_config_ckanAPIKey
+            required: true,
+            coerce: coerceJson
         })
         .option("externalUrl", {
             describe:
@@ -40,7 +32,7 @@ minion({
     aspects: ["ckan-export"],
     optionalAspects: [],
     writeAspectDefs: [ckanExportAspectDef],
-    onRecordFound: partial(onRecordFound, ckanClient, argv.externalUrl)
+    onRecordFound: partial(onRecordFound, argv.externalUrl, ckanServerApiKeyMap as CkanServerApiKeyMap)
 }).catch(e => {
     console.error("Error: " + e.message, e);
     process.exit(1);

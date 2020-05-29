@@ -337,8 +337,8 @@ async function updateCkanPackage(
 }
 
 export default async function onRecordFound(
-    ckanClient: CkanClient,
     externalUrl: string,
+    ckanServerApiKeyMap: CkanServerApiKeyMap,
     record: Record,
     registry: AuthorizedRegistryClient
 ) {
