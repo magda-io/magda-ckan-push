@@ -11,7 +11,7 @@ interface PlainObjectType {
     [key: string]: any;
 }
 
-export interface CkanExportAspectType {
+export interface CkanExportAspectProperties {
     status: "retain" | "withdraw";
     exportUserId?: string;
     ckanId?: string;
@@ -22,15 +22,25 @@ export interface CkanExportAspectType {
     exportError?: string;
 }
 
+export interface CkanExportAspectType {
+    [key: string]: CkanExportAspectProperties;
+}
+
+export interface CkanServerApiKeyMap {
+    [key: string]: {
+        apiKey: string;
+    };
+}
+
 async function recordSuccessCkanExportAction(
     recordId: string,
     tenantId: number,
     registry: AuthorizedRegistryClient,
-    ckanExportData: CkanExportAspectType,
+    ckanExportData: CkanExportAspectProperties,
     ckanId?: string
 ) {
     console.log("Recording successful export");
-    const data: CkanExportAspectType = {
+    const data: CkanExportAspectProperties = {
         ...ckanExportData,
         exportRequired: false,
         exportAttempted: true,
@@ -61,10 +71,10 @@ async function recordFailCkanExportAction(
     recordId: string,
     tenantId: number,
     registry: AuthorizedRegistryClient,
-    ckanExportData: CkanExportAspectType,
+    ckanExportData: CkanExportAspectProperties,
     error: Error | string
 ) {
-    const data: CkanExportAspectType = {
+    const data: CkanExportAspectProperties = {
         ...ckanExportData,
         exportAttempted: true,
         lastExportAttemptTime: new Date().toISOString(),
