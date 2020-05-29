@@ -377,11 +377,11 @@ describe("Magda ckan-exporter minion", function(this: Mocha.ISuiteCallbackContex
     before(() => {
         sinon.stub(console, "info");
     });
-    
+
     after(() => {
         (console.info as any).restore();
     });
-    
+
     beforeEach(() => {
         registryScope = nock(registryUrl);
         ckanScope = nock(CKAN_SERVER_URL, {reqheaders: { authorization: CKAN_API_KEY}})
