@@ -331,6 +331,111 @@ async function updateCkanPackage(
     return pkg.id;
 }
 
+// The actual export function
+async function manageExport (
+        ckanClient: CkanClient,
+        ckanExportData: CkanExportAspectProperties,
+        recordData: Record,
+        tenantId: number,
+        registry: AuthorizedRegistryClient,
+        externalUrl: string
+    ) {
+
+    if (ckanExportData.status === "withdraw") {
+        console.log("withdrawing this.");
+        if (!ckanExportData.hasCreated || !ckanExportData.ckanId) {
+            console.log("Good news. Package has not been created, neither does it have a ckanId. Either way, nothing to do here.");
+            return;
+        }
+        const pkgData = await ckanClient.getPackage(ckanExportData.ckanId);
+        console.log("Withdrawing package. pkgData: ", pkgData);
+        if (pkgData) {
+            try {
+                await ckanClient.callCkanFunc("package_delete", {
+                    id: ckanExportData.ckanId
+                });
+            } catch (e) {
+                await recordFailCkanExportAction(
+                    recordData.id,
+                    tenantId,
+                    registry,
+                    ckanExportData,
+                    e
+                );
+            }
+        }
+
+        await recordSuccessCkanExportAction(
+            recordData.id,
+            tenantId,
+            registry,
+            ckanExportData
+        );
+    } else if (ckanExportData.status === "retain") {
+        let ckanId: string;
+        let exportError: Error;
+        console.log("Retaining record ", recordData.name)
+        try {
+            if (ckanExportData.hasCreated && ckanExportData.ckanId) {
+                console.log("It's been created and has an id")
+                const pkgData = await ckanClient.getPackage(
+                    ckanExportData.ckanId
+                );
+                console.log("Here is the pkgData: ", pkgData);
+                if (pkgData) {
+                    console.log("Updating ckan package")
+                    ckanId = ckanExportData.ckanId;
+                    await updateCkanPackage(
+                        ckanClient,
+                        ckanId,
+                        recordData,
+                        externalUrl
+                    );
+                } else {
+                    console.log('Could not find packge data. Creating fresh package');
+                    ckanId = await createCkanPackage(
+                        ckanClient,
+                        recordData,
+                        externalUrl
+                    );
+                }
+            } else {
+                console.log("Package never existed. starting from scratch");
+                ckanId = await createCkanPackage(
+                    ckanClient,
+                    recordData,
+                    externalUrl
+                );
+            }
+        } catch (e) {
+            exportError = e;
+        }
+
+        if (exportError) {
+            console.log("Error while exporting: ", exportError)
+            await recordFailCkanExportAction(
+                recordData.id,
+                tenantId,
+                registry,
+                ckanExportData,
+                exportError
+            );
+        } else {
+            console.log("success while exporting")
+            await recordSuccessCkanExportAction(
+                recordData.id,
+                tenantId,
+                registry,
+                ckanExportData,
+                ckanId
+            );
+        }
+    } else {
+        // Shouldn't get here
+        throw new Error(`Unknow ckan export status: ${ckanExportData.status}`);
+    }
+};
+
 export default async function onRecordFound(
     externalUrl: string,
     ckanServerApiKeyMap: CkanServerApiKeyMap,
@@ -356,116 +461,39 @@ export default async function onRecordFound(
             throw recordData;
         }
 
-        const ckanExportData = record.aspects["ckan-export"] as CkanExportAspectType;
-        if (!ckanExportData) {
+        const ckanExportAspect = record.aspects["ckan-export"] as CkanExportAspectType;
+        if (!ckanExportAspect) {
             console.log(
                 "The dataset record has no ckan-export aspect. Ignore webhook request."
             );
             return;
         }
 
-        if (!ckanExportData.exportRequired) {
-            console.log(
-                `Ignore as no export is required for dataset id ${recordData.id} and name ${recordData.name}. ckanExportData `,
-                ckanExportData
-            );
-            return;
-        }
-
-        // console.log("Exporting is required. ckanExportData: ", ckanExportData);
-
-        if (ckanExportData.status === "withdraw") {
-            console.log("withdrawing this.");
-            if (!ckanExportData.hasCreated || !ckanExportData.ckanId) {
-                console.log("good news. it's not been created. or it doesn't have a ckanId. either way, nothing to do here.");
-                return;
+        await Object.keys(ckanExportAspect).forEach((ckanServerUrl: string, _idx: number) => {
+            const ckanExportData = ckanExportAspect[ckanServerUrl]
+            const apiKey = ckanServerApiKeyMap[ckanServerUrl]?.apiKey;
+            if(apiKey === undefined) {
+                console.log(`No API Key found for the server ${ckanServerUrl}`);
+                return null;
             }
-            const pkgData = await ckanClient.getPackage(ckanExportData.ckanId);
-            // console.log("withdrawing package. pkgData: ", pkgData);
-            if (pkgData) {
-                try {
-                    await ckanClient.callCkanFunc("package_delete", {
-                        id: ckanExportData.ckanId
-                    });
-                } catch (e) {
-                    await recordFailCkanExportAction(
-                        recordData.id,
-                        tenantId,
-                        registry,
-                        ckanExportData,
-                        e
-                    );
-                }
+            if (!ckanExportData.exportRequired) {
+                console.log(
+                    `Ignore as no export is required for dataset id ${recordData.id} and name ${recordData.name}. ckanExportData `,
+                    ckanExportData
+                );
+                return null;
             }
+            console.log("Exporting is required. ckanExportData: ", ckanExportData);
 
-            await recordSuccessCkanExportAction(
-                recordData.id,
+            return manageExport(
+                new CkanClient(ckanServerUrl, apiKey),
+                ckanExportData,
+                recordData,
                 tenantId,
                 registry,
-                ckanExportData
+                externalUrl
             );
-        } else if (ckanExportData.status === "retain") {
-            let ckanId: string;
-            let error: Error;
-            // console.log("Retaining record ", record.name)
-            try {
-                if (ckanExportData.hasCreated && ckanExportData.ckanId) {
-                    console.log("it's been created and has an id")
-                    const pkgData = await ckanClient.getPackage(
-                        ckanExportData.ckanId
-                    );
-                    // console.log("here is the pkgData: ", pkgData);
-                    if (pkgData) {
-                        console.log("updating ckan package")
-                        ckanId = ckanExportData.ckanId;
-                        await updateCkanPackage(
-                            ckanClient,
-                            ckanId,
-                            recordData,
-                            externalUrl
-                        );
-                    } else {
-                        ckanId = await createCkanPackage(
-                            ckanClient,
-                            recordData,
-                            externalUrl
-                        );
-                    }
-                } else {
-                    console.log("package never existed. starting from scratch");
-                    ckanId = await createCkanPackage(
-                        ckanClient,
-                        recordData,
-                        externalUrl
-                    );
-                }
-            } catch (e) {
-                error = e;
-            }
-
-            if (error) {
-                console.log("Error while exporting: ", error)
-                await recordFailCkanExportAction(
-                    recordData.id,
-                    tenantId,
-                    registry,
-                    ckanExportData,
-                    error
-                );
-            } else {
-                console.log("success while exporting")
-                await recordSuccessCkanExportAction(
-                    recordData.id,
-                    tenantId,
-                    registry,
-                    ckanExportData,
-                    ckanId
-                );
-            }
-        } else {
-            // Shouldn't get here
-            throw new Error(`Unknow ckan export status: ${ckanExportData.status}`);
-        }
+        });
     } catch (e) {
         console.error(
             `Error occured when processing event for record ${
