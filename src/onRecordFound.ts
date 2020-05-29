@@ -469,7 +469,7 @@ export default async function onRecordFound(
             return;
         }
 
-        await Object.keys(ckanExportAspect).forEach((ckanServerUrl: string, _idx: number) => {
+        const exportCmds = Object.keys(ckanExportAspect).map(async (ckanServerUrl: string, _idx: number) => {
             const ckanExportData = ckanExportAspect[ckanServerUrl]
             const apiKey = ckanServerApiKeyMap[ckanServerUrl]?.apiKey;
             if(apiKey === undefined) {
@@ -494,6 +494,7 @@ export default async function onRecordFound(
                 externalUrl
             );
         });
+        await Promise.all(exportCmds);
     } catch (e) {
         console.error(
             `Error occured when processing event for record ${
