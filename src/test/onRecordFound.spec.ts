@@ -1,8 +1,7 @@
-import onRecordFound, { CkanExportAspectType } from "../onRecordFound";
+import onRecordFound, { CkanExportAspectProperties, CkanServerApiKeyMap } from "../onRecordFound";
 import { expect } from "chai";
 import sinon from "sinon";
 import nock from "nock";
-import CkanClient from "../CkanClient";
 import _ from "lodash";
 const partial = require("lodash/partial");
 
@@ -10,12 +9,17 @@ import { AuthorizedRegistryClient } from "@magda/minion-sdk";
 const CKAN_SERVER_URL = 'http://test.demo.ckan.org'
 const CKAN_API_KEY = '2fbecb5d-dc63-45db-9a90-32a6c4a49e73';
 const USER_ID = "b1fddd6f-e230-4068-bd2c-1a21844f1598";
-const ckanClient = new CkanClient(CKAN_SERVER_URL, CKAN_API_KEY);
 const EXTERNAL_URL = 'minikube.data.gov.au'
 
-const curriedOnRecordFound = partial(onRecordFound, ckanClient, EXTERNAL_URL);
+const ckanServerApiKeyMap: CkanServerApiKeyMap = {
+    [CKAN_SERVER_URL]: {
+        apiKey: CKAN_API_KEY,
+    }
+}
 
-const registryUrl = "http://example.com";
+const curriedOnRecordFound = partial(onRecordFound, EXTERNAL_URL, ckanServerApiKeyMap);
+
+const registryUrl = "http://registry.example.com";
 const registry = new AuthorizedRegistryClient({
     baseUrl: registryUrl,
     jwtSecret: "squirrelsquirrelsquirrelsquirrel4s",
@@ -329,11 +333,13 @@ tokenCkanResponse;
 
 const testRecord = {
     aspects:{
-        "ckan-export":{
-            hasCreated: false,
-            exportAttempted: false,
-            exportRequired: true,
-            status: "retain"
+        "ckan-export": {
+            [CKAN_SERVER_URL]: {
+                hasCreated: false,
+                exportAttempted: false,
+                exportRequired: true,
+                status: "retain"
+            }
         },
         "dcat-dataset-strings":{
             accrualPeriodicity: "asNeeded",
@@ -427,7 +433,7 @@ describe("Magda ckan-exporter minion", function(this: Mocha.ISuiteCallbackContex
         it("Should not create", async () => {
             // If all the mocks are satisfied,
             // we can assume a successful creation of a ckan package
-            const newCkanExportAspect: CkanExportAspectType = {
+            const newCkanExportAspect: CkanExportAspectProperties = {
                 hasCreated: false,
                 exportAttempted: false,
                 exportRequired: false,
@@ -435,7 +441,7 @@ describe("Magda ckan-exporter minion", function(this: Mocha.ISuiteCallbackContex
                 ckanId: "0",
             };
             var newTestRecord = testRecord;
-            newTestRecord.aspects["ckan-export"] = newCkanExportAspect;
+            newTestRecord.aspects["ckan-export"][CKAN_SERVER_URL]= newCkanExportAspect;
             newTestRecord.id = "ckan-export-create-pkg-test-failure"
 
             registryScope
@@ -469,7 +475,7 @@ describe("Magda ckan-exporter minion", function(this: Mocha.ISuiteCallbackContex
         it("Successful update", async () => {
             // If all the mocks are satisfied,
             // we can assume a successful creation of a ckan package
-            const newCkanExportAspect: CkanExportAspectType = {
+            const newCkanExportAspect: CkanExportAspectProperties = {
                 hasCreated: true,
                 exportAttempted: true,
                 exportRequired: true,
@@ -477,7 +483,7 @@ describe("Magda ckan-exporter minion", function(this: Mocha.ISuiteCallbackContex
                 ckanId: "0",
             };
             var newTestRecord = testRecord;
-            newTestRecord.aspects["ckan-export"] = newCkanExportAspect;
+            newTestRecord.aspects["ckan-export"][CKAN_SERVER_URL] = newCkanExportAspect;
             newTestRecord.id = "ckan-export-update-pkg-test-success"
 
             registryScope
@@ -509,7 +515,7 @@ describe("Magda ckan-exporter minion", function(this: Mocha.ISuiteCallbackContex
         it("Should not update", async () => {
             // If all the mocks are satisfied,
             // we can assume a successful creation of a ckan package
-            const newCkanExportAspect: CkanExportAspectType = {
+            const newCkanExportAspect: CkanExportAspectProperties = {
                 hasCreated: true,
                 exportAttempted: true,
                 exportRequired: false,
@@ -517,7 +523,7 @@ describe("Magda ckan-exporter minion", function(this: Mocha.ISuiteCallbackContex
                 ckanId: "0",
             };
             var newTestRecord = testRecord;
-            newTestRecord.aspects["ckan-export"] = newCkanExportAspect;
+            newTestRecord.aspects["ckan-export"][CKAN_SERVER_URL]= newCkanExportAspect;
             newTestRecord.id = "ckan-export-update-pkg-test-failure"
 
             registryScope
@@ -552,7 +558,7 @@ describe("Magda ckan-exporter minion", function(this: Mocha.ISuiteCallbackContex
             // If all the mocks are satisfied,
             // we can assume a successful creation of a ckan package
 
-            const newCkanExportAspect: CkanExportAspectType = {
+            const newCkanExportAspect: CkanExportAspectProperties = {
                 hasCreated: true,
                 exportAttempted: true,
                 exportRequired: true,
@@ -560,7 +566,7 @@ describe("Magda ckan-exporter minion", function(this: Mocha.ISuiteCallbackContex
                 ckanId: "0",
             };
             var newTestRecord = testRecord;
-            newTestRecord.aspects["ckan-export"] = newCkanExportAspect;
+            newTestRecord.aspects["ckan-export"][CKAN_SERVER_URL]= newCkanExportAspect;
             newTestRecord.id = "ckan-export-delete-pkg-test-success"
 
             registryScope
@@ -588,7 +594,7 @@ describe("Magda ckan-exporter minion", function(this: Mocha.ISuiteCallbackContex
         it("Should not delete", async () => {
             // If all the mocks are satisfied,
             // we can assume a successful creation of a ckan package
-            const newCkanExportAspect: CkanExportAspectType = {
+            const newCkanExportAspect: CkanExportAspectProperties = {
                 hasCreated: true,
                 exportAttempted: true,
                 exportRequired: false,
@@ -596,7 +602,7 @@ describe("Magda ckan-exporter minion", function(this: Mocha.ISuiteCallbackContex
                 ckanId: "0",
             };
             var newTestRecord = testRecord;
-            newTestRecord.aspects["ckan-export"] = newCkanExportAspect;
+            newTestRecord.aspects["ckan-export"][CKAN_SERVER_URL]= newCkanExportAspect;
             newTestRecord.id = "ckan-export-delete-pkg-test-failure"
 
             registryScope
