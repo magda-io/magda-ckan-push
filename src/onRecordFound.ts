@@ -5,7 +5,6 @@ import {
 import CkanClient from "./CkanClient";
 import ckanExportAspectDef from "./ckanExportAspectDef";
 import URI from "urijs";
-// const _ = require("lodash");
 
 interface PlainObjectType {
     [key: string]: any;
@@ -92,7 +91,6 @@ async function recordFailCkanExportAction(
 }
 
 async function createDistributionData(
-    ckanClient: CkanClient,
     externalUrl: string,
     record: Record,
     distribution: Record
@@ -166,7 +164,6 @@ async function createDistributionData(
 }
 
 async function createCkanDistributionsFromDataset(
-    ckanClient: CkanClient,
     externalUrl: string,
     record: Record
 ): Promise<PlainObjectType[]> {
@@ -178,7 +175,7 @@ async function createCkanDistributionsFromDataset(
         ] as Record[];
         return await Promise.all(
             distributions.map(item =>
-                createDistributionData(ckanClient, externalUrl, record, item)
+                createDistributionData(externalUrl, record, item)
             )
         );
     } else {
@@ -286,7 +283,6 @@ async function createCkanPackage(
     // console.log("Done! Here is the data: ", data)
     console.log("Now creating ckan distribution from dataset...")
     const distributions = await createCkanDistributionsFromDataset(
-        ckanClient,
         externalUrl,
         record
     );
@@ -323,7 +319,6 @@ async function updateCkanPackage(
     };
 
     const distributions = await createCkanDistributionsFromDataset(
-        ckanClient,
         externalUrl,
         record
     );
