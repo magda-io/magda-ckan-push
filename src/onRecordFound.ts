@@ -17,7 +17,7 @@ export interface CkanExportAspectProperties {
     hasCreated: boolean;
     exportRequired: boolean;
     exportAttempted: boolean;
-    lastExportAttemptTime?: string;
+    lastExportAttemptTime?: Date;
     exportError?: string;
 }
 
@@ -35,24 +35,32 @@ async function recordSuccessCkanExportAction(
     recordId: string,
     tenantId: number,
     registry: AuthorizedRegistryClient,
-    ckanExportData: CkanExportAspectProperties,
+    ckanExportProps: CkanExportAspectProperties,
+    ckanExportData: CkanExportAspectType,
+    ckanServerUrl: string,
     ckanId?: string
 ) {
     console.log("Recording successful export");
-    const data: CkanExportAspectProperties = {
-        ...ckanExportData,
+
+    const newProps: CkanExportAspectProperties = {
+        ...ckanExportProps,
         exportRequired: false,
         exportAttempted: true,
-        lastExportAttemptTime: new Date().toISOString(),
+        lastExportAttemptTime: new Date(),
         exportError: ""
     };
+
     if (ckanId) {
-        data.ckanId = ckanId;
-        data.hasCreated = true;
+        newProps.ckanId = ckanId;
+        newProps.hasCreated = true;
     } else {
-        data.ckanId = undefined;
-        data.hasCreated = false;
+        newProps.ckanId = undefined;
+        newProps.hasCreated = false;
     }
+    const data: CkanExportAspectType = {
+        ...ckanExportData,
+        [ckanServerUrl]: newProps,
+    };
     // console.log("Here is the data that I'm putting in the record-aspects table: ", data);
     const res = await registry.putRecordAspect(
         recordId,
@@ -70,21 +78,31 @@ async function recordFailCkanExportAction(
     recordId: string,
     tenantId: number,
     registry: AuthorizedRegistryClient,
-    ckanExportData: CkanExportAspectProperties,
+    ckanExportProps: CkanExportAspectProperties,
+    ckanExportData: CkanExportAspectType,
+    ckanServerUrl: string,
     error: Error | string
 ) {
-    const data: CkanExportAspectProperties = {
-        ...ckanExportData,
+
+    const newProps: CkanExportAspectProperties = {
+        ...ckanExportProps,
         exportAttempted: true,
-        lastExportAttemptTime: new Date().toISOString(),
+        lastExportAttemptTime: new Date(),
         exportError: `${error}`
     };
+
+    const data: CkanExportAspectType = {
+        ...ckanExportData,
+        [ckanServerUrl]: newProps,
+    };
+
     const res = await registry.putRecordAspect(
         recordId,
         ckanExportAspectDef.id,
         data,
         tenantId
     );
+
     if (res instanceof Error) {
         throw Error;
     }
@@ -334,32 +352,36 @@ async function updateCkanPackage(
 // The actual export function
 async function manageExport (
         ckanClient: CkanClient,
-        ckanExportData: CkanExportAspectProperties,
+        ckanExportProps: CkanExportAspectProperties,
+        ckanExportData: CkanExportAspectType,
+        ckanServerUrl: string,
         recordData: Record,
         tenantId: number,
         registry: AuthorizedRegistryClient,
         externalUrl: string
     ) {
 
-    if (ckanExportData.status === "withdraw") {
+    if (ckanExportProps.status === "withdraw") {
         console.log("withdrawing this.");
-        if (!ckanExportData.hasCreated || !ckanExportData.ckanId) {
+        if (!ckanExportProps.hasCreated || !ckanExportProps.ckanId) {
             console.log("Good news. Package has not been created, neither does it have a ckanId. Either way, nothing to do here.");
             return;
         }
-        const pkgData = await ckanClient.getPackage(ckanExportData.ckanId);
+        const pkgData = await ckanClient.getPackage(ckanExportProps.ckanId);
         console.log("Withdrawing package. pkgData: ", pkgData);
         if (pkgData) {
             try {
                 await ckanClient.callCkanFunc("package_delete", {
-                    id: ckanExportData.ckanId
+                    id: ckanExportProps.ckanId
                 });
             } catch (e) {
                 await recordFailCkanExportAction(
                     recordData.id,
                     tenantId,
                     registry,
+                    ckanExportProps,
                     ckanExportData,
+                    ckanServerUrl,
                     e
                 );
             }
@@ -369,22 +391,24 @@ async function manageExport (
             recordData.id,
             tenantId,
             registry,
-            ckanExportData
+            ckanExportProps,
+            ckanExportData,
+            ckanServerUrl
         );
-    } else if (ckanExportData.status === "retain") {
+    } else if (ckanExportProps.status === "retain") {
         let ckanId: string;
         let exportError: Error;
         console.log("Retaining record ", recordData.name)
         try {
-            if (ckanExportData.hasCreated && ckanExportData.ckanId) {
+            if (ckanExportProps.hasCreated && ckanExportProps.ckanId) {
                 console.log("It's been created and has an id")
                 const pkgData = await ckanClient.getPackage(
-                    ckanExportData.ckanId
+                    ckanExportProps.ckanId
                 );
                 console.log("Here is the pkgData: ", pkgData);
                 if (pkgData) {
                     console.log("Updating ckan package")
-                    ckanId = ckanExportData.ckanId;
+                    ckanId = ckanExportProps.ckanId;
                     await updateCkanPackage(
                         ckanClient,
                         ckanId,
@@ -417,7 +441,9 @@ async function manageExport (
                 recordData.id,
                 tenantId,
                 registry,
+                ckanExportProps,
                 ckanExportData,
+                ckanServerUrl,
                 exportError
             );
         } else {
@@ -426,7 +452,9 @@ async function manageExport (
                 recordData.id,
                 tenantId,
                 registry,
+                ckanExportProps,
                 ckanExportData,
+                ckanServerUrl,
                 ckanId
             );
         }
@@ -461,33 +489,36 @@ export default async function onRecordFound(
             throw recordData;
         }
 
-        const ckanExportAspect = record.aspects["ckan-export"] as CkanExportAspectType;
-        if (!ckanExportAspect) {
+        const ckanExportData = recordData.aspects["ckan-export"] as CkanExportAspectType;
+        if (!ckanExportData) {
             console.log(
                 "The dataset record has no ckan-export aspect. Ignore webhook request."
             );
             return;
         }
 
-        const exportCmds = Object.keys(ckanExportAspect).map(async (ckanServerUrl: string, _idx: number) => {
-            const ckanExportData = ckanExportAspect[ckanServerUrl]
+        const exportCmds = Object.keys(ckanExportData).map(async (ckanServerUrl: string, _idx: number) => {
+            const ckanExportProps = ckanExportData[ckanServerUrl]
             const apiKey = ckanServerApiKeyMap[ckanServerUrl]?.apiKey;
             if(apiKey === undefined) {
                 console.log(`No API Key found for the server ${ckanServerUrl}`);
                 return null;
             }
-            if (!ckanExportData.exportRequired) {
+            if (!ckanExportProps.exportRequired) {
                 console.log(
-                    `Ignore as no export is required for dataset id ${recordData.id} and name ${recordData.name}. ckanExportData `,
-                    ckanExportData
+                    `Ignore as no export is required for dataset id ${recordData.id} and name ${recordData.name}. ckanExportProps `,
+                    ckanExportProps
                 );
                 return null;
             }
-            console.log("Exporting is required. ckanExportData: ", ckanExportData);
+            console.log("Exporting is required. ckanExportData: ", ckanExportProps);
+            console.log("Name of the record being exported: ", recordData.name);
 
             return manageExport(
                 new CkanClient(ckanServerUrl, apiKey),
+                ckanExportProps,
                 ckanExportData,
+                ckanServerUrl,
                 recordData,
                 tenantId,
                 registry,
