@@ -460,7 +460,7 @@ async function manageExport (
         }
     } else {
         // Shouldn't get here
-        throw new Error(`Unknow ckan export status: ${ckanExportData.status}`);
+        throw new Error(`Unknown ckan export status: ${ckanExportProps.status}`);
     }
 };
 
