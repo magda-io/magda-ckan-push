@@ -12,7 +12,9 @@ const argv = commonYargs(6122, "http://localhost:6122", argv =>
         .option("ckanServerKeyMap", {
             describe: "JSON File that contains CKAN server url to CKAN Api key mapping",
             type: "string",
-            required: true,
+            default:
+                process.env.CKAN_SERVER_KEY_MAP ||
+                process.env.npm_package_config_ckanServerKeyMap,
             coerce: coerceJson
         })
         .option("externalUrl", {
