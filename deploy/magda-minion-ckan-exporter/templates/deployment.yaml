@@ -20,9 +20,17 @@ spec:
       imagePullSecrets:
       - name: {{ $imagePullSecret }}
       {{- end }}
+      volumes:
+      - name: ckan-server-api-key-map
+        secret:
+          secretName: ckan-exporter-secrets
       containers:
       - name: magda-minion-ckan-exporter
         image: "{{ .Values.image.repository | default .Values.global.minions.image.repository | default .Values.global.image.repository | default .Values.defaultImage.repository }}/{{ .Values.image.name }}:{{ .Values.image.tag | default .Values.global.minions.image.tag | default .Values.global.image.tag | default .Values.defaultImage.tag }}"
+        volumeMounts:
+        - name: ckan-server-api-key-map
+          mountPath: "/etc/config"
+          readOnly: true
         imagePullPolicy: {{ .Values.image.pullPolicy | default .Values.global.minions.image.pullPolicy | default .Values.global.image.pullPolicy | default .Values.defaultImage.pullPolicy }}
 {{- if .Values.global.enableLivenessProbes }}
         livenessProbe:
@@ -61,7 +69,7 @@ spec:
           value: {{ .Values.ckanServerUrl }}
         - name: USER_ID
           value: {{ .Values.global.defaultAdminUserId | default .Values.defaultAdminUserId }}
-        - name: CKAN_DEFAULT_API_KEY
-          value: {{ .Values.ckanDefaultAPIKey }}
         - name: EXTERNAL_URL
           value: {{ .Values.global.externalUrl }}
+        - name: CKAN_SERVER_KEY_MAP
+          value: /etc/config/ckan_server_api_key_map.json
