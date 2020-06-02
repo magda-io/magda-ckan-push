@@ -497,6 +497,7 @@ export default async function onRecordFound(
             return;
         }
 
+        console.log('ckanExportData: ', ckanExportData)
         const exportCmds = Object.keys(ckanExportData).map(async (ckanServerUrl: string, _idx: number) => {
             const ckanExportProps = ckanExportData[ckanServerUrl]
             const apiKey = ckanServerApiKeyMap[ckanServerUrl]?.apiKey;
