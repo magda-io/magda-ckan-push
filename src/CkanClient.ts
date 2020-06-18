@@ -275,27 +275,37 @@ class CkanClient {
     }
 
     /**
-     * Generate Ckan name from title
-     *
-     * @param {string} title
-     * @returns {Promise<string>}
-     * @memberof CkanClient
+     * Converts a string into a CKAN compliant name
+     * @param {string} name The string you want to convert to just alpha num 
+     * @returns {string} The converted string
      */
-    async getAvailablePackageName(title: string): Promise<string> {
-        if (!title.trim().length) {
-            throw new Error("title cannot be empty string.");
-        }
-
-        let name = title
+    static toAlphaNum(name: string): string {
+        let convertedStr = name
             .toLowerCase()
             .replace(/\s+/g, " ")
             .trim()
             .replace(/[^a-z0-9-]/gi, "-")
             .replace(/-+/g, "-")
             .substr(0, 100);
-        if (name.length < 2) {
-            name = name + "--";
+        if (convertedStr.length < 2) {
+            convertedStr = convertedStr + "--";
         }
+        return convertedStr;
+    }
+
+    /**
+     * Generate Ckan name from title
+     *
+     * @param {string} title
+     * @returns {Promise<string>}
+     * @memberof CkanClient
+     */
+    async getAvailableCkanName(title: string): Promise<string> {
+        if (!title.trim().length) {
+            throw new Error("title cannot be empty string.");
+        }
+
+        let name = CkanClient.toAlphaNum(title);
 
         if (!(await this.packageNameOrIdExist(name))) {
             return name;
@@ -304,11 +314,9 @@ class CkanClient {
         const randomStr = shortId().toLowerCase();
 
         name = name.substr(0, 100 - randomStr.length - 1) + "-" + randomStr;
-
         if (!(await this.packageNameOrIdExist(name))) {
             return name;
         }
-
         return uuidv4();
     }
 
@@ -354,7 +362,7 @@ class CkanClient {
     async createDataset() {
         const title = "test push dataset";
         let result = await this.callCkanFunc("package_create", {
-            name: await this.getAvailablePackageName(title),
+            name: await this.getAvailableCkanName(title),
             title: "test push dataset"
         });
         return result;

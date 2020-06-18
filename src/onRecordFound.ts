@@ -207,7 +207,7 @@ async function createCkanPackageDataFromDataset(
     record: Record
 ) {
     const data = {
-        name: await ckanClient.getAvailablePackageName(record.name),
+        name: await ckanClient.getAvailableCkanName(record.name),
         state: "active",
         title:
             record?.aspects?.["dcat-dataset-strings"]?.["title"] ?? record.name
@@ -266,9 +266,9 @@ async function createCkanPackageDataFromDataset(
         const tagsData =
             record?.aspects?.["dcat-dataset-strings"]?.["keywords"];
         if (typeof tagsData === "string") {
-            data.tags = [{ name: tagsData }];
+            data.tags = [{ name: CkanClient.toAlphaNum(tagsData) }];
         } else if (tagsData.length) {
-            data.tags = (tagsData as string[]).map(name => ({ name }));
+            data.tags = (tagsData as string[]).map(name => ({ name: CkanClient.toAlphaNum(name) }));
         }
     }
 
