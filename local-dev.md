@@ -66,7 +66,25 @@ go to `minikube-dev.yml` in magda and comment out the following:
 
 ### Deploying
 
-Deploying now should be as simple as running a helm upgrade:
+Before you deploy, you need to create a k8s secret with a file that contains your CKAN api keys.
+The map should look like this:
+
+```json
+{
+    "https://demo.ckan.org": {
+        "apiKey": "blah"
+    }
+}
+```
+
+To create the secret, run :
+
+```console
+$ kubectl create secret generic ckan-exporter-secrets --from-file=/path/to/file.json
+secret/ckan-exporter-secrets created
+```
+
+Deploying now should be as simple as running a helm upgrade from magda:
 
 ```bash
 helm upgrade --install --timeout 9999s --wait -f deploy/helm/minikube-dev.yml magda deploy/helm/magda
