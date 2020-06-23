@@ -326,11 +326,16 @@ class CkanClient {
 
     async searchLicense(licenseName: string) {
         const licenseList = await this.callCkanFunc<LicenseDataType[]>(
-            "license_list"
+            "license_list",
+            {
+                query: licenseName
+            }
         );
-        const name = licenseName.trim().toLowerCase();
+        const name = CkanClient.makeLicenseId(licenseName);
         return licenseList.find(
-            license => license.title.trim().toLowerCase() === name
+            (license) => {
+                return CkanClient.makeLicenseId(license.title) === name;
+            }
         );
     }
 
