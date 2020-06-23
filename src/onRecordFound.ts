@@ -228,10 +228,14 @@ async function createCkanPackageDataFromDataset(
         const license = await ckanClient.searchLicense(licenseStr);
         if (license) {
             data.license_id = license.id;
+        } else {
+            // Creating own license
+            data.license_id = CkanClient.makeLicenseId(licenseStr);
         }
     } else if (
         record?.aspects?.["dataset-distributions"]?.["distributions"].length
     ) {
+        // If the license is at the dist level
         let disLicenseList: Record[] =
             record?.aspects?.["dataset-distributions"]?.["distributions"] ?? [];
         if (disLicenseList.length) {
