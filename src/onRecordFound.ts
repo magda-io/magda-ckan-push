@@ -264,13 +264,13 @@ async function createCkanPackageDataFromDataset(
         data.notes = record?.aspects?.["dcat-dataset-strings"]?.["description"];
     }
 
-    const temporalCoverage: Array<any> = record.aspects['temporal-coverage'].intervals;
+    const temporalCoverage: Array<any> = record.aspects?.['temporal-coverage'].intervals;
     const startDates: Date[] = temporalCoverage.map((o: any) => o.start);
     const endDates: Date[] = temporalCoverage.map((o: any) => o.end);
     let temporalCoverageFrom: Date = min(startDates);
     let temporalCoverageTo: Date = max(endDates);
 
-    const countryId = record.aspects['spatial-coverage']?.['lv1Id']
+    const countryId = record.aspects?.['spatial-coverage']?.['lv1Id']
     let country = null;
     if(countryId) {
         if(countryId === '1') {
@@ -279,9 +279,9 @@ async function createCkanPackageDataFromDataset(
             country = "Australian Offshore Remote Territories"
         }
     }
-    const updateFreq = record.aspects['dcat-dataset-strings']?.accrualPeriodicity;
-    const currency = record.aspects['currency'].status;
-    const language = record.aspects['dcat-dataset-strings']?.languages[0];
+    const updateFreq = record.aspects?.['dcat-dataset-strings']?.accrualPeriodicity;
+    const currency = record.aspects?.['currency']?.status;
+    const language = record.aspects?.['dcat-dataset-strings']?.languages[0];
 
     const extras: Array<{[key: string]: string}> = [
         {
