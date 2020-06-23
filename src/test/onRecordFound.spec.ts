@@ -27,6 +27,16 @@ const registry = new AuthorizedRegistryClient({
     tenantId: 1
 });
 
+const optionalAspects = [
+    "ckan-export",
+    "dataset-distributions",
+    "temporal-coverage",
+    "dataset-publisher",
+    "provenance",
+    "currency",
+    "spatial-coverage"
+];
+
 // Response, test data, etc
 
 const ckanLicenseList = [
@@ -409,9 +419,7 @@ describe("Magda ckan-exporter minion", function(this: Mocha.ISuiteCallbackContex
                 .query({
                     "aspect": "dcat-dataset-strings",
                     "dereference": true,
-                    "optionalAspect": [
-                        "ckan-export", "dataset-distributions", "temporal-coverage", "dataset-publisher", "provenance"
-                    ],
+                    "optionalAspect": optionalAspects,
                 })
                 .reply(200, testRecord);
             registryScope
@@ -449,9 +457,7 @@ describe("Magda ckan-exporter minion", function(this: Mocha.ISuiteCallbackContex
                 .query({
                     "aspect": "dcat-dataset-strings",
                     "dereference": true,
-                    "optionalAspect": [
-                        "ckan-export", "dataset-distributions", "temporal-coverage", "dataset-publisher", "provenance"
-                    ],
+                    "optionalAspect": optionalAspects,
                 })
                 .reply(200, newTestRecord);
             registryScope
@@ -491,9 +497,7 @@ describe("Magda ckan-exporter minion", function(this: Mocha.ISuiteCallbackContex
                 .query({
                     "aspect": "dcat-dataset-strings",
                     "dereference": true,
-                    "optionalAspect": [
-                        "ckan-export", "dataset-distributions", "temporal-coverage", "dataset-publisher", "provenance"
-                    ],
+                    "optionalAspect": optionalAspects,
                 })
                 .reply(200, newTestRecord);
             registryScope
@@ -531,9 +535,7 @@ describe("Magda ckan-exporter minion", function(this: Mocha.ISuiteCallbackContex
                 .query({
                     "aspect": "dcat-dataset-strings",
                     "dereference": true,
-                    "optionalAspect": [
-                        "ckan-export", "dataset-distributions", "temporal-coverage", "dataset-publisher", "provenance"
-                    ],
+                    "optionalAspect": optionalAspects,
                 })
                 .reply(200, newTestRecord);
             registryScope
@@ -574,9 +576,7 @@ describe("Magda ckan-exporter minion", function(this: Mocha.ISuiteCallbackContex
                 .query({
                     "aspect": "dcat-dataset-strings",
                     "dereference": true,
-                    "optionalAspect": [
-                        "ckan-export", "dataset-distributions", "temporal-coverage", "dataset-publisher", "provenance"
-                    ],
+                    "optionalAspect": optionalAspects,
                 })
                 .reply(200, newTestRecord);
             registryScope
@@ -610,9 +610,7 @@ describe("Magda ckan-exporter minion", function(this: Mocha.ISuiteCallbackContex
                 .query({
                     "aspect": "dcat-dataset-strings",
                     "dereference": true,
-                    "optionalAspect": [
-                        "ckan-export", "dataset-distributions", "temporal-coverage", "dataset-publisher", "provenance"
-                    ],
+                    "optionalAspect": optionalAspects,
                 })
                 .reply(200, newTestRecord);
             registryScope
