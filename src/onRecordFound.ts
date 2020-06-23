@@ -5,6 +5,7 @@ import {
 import CkanClient from "./CkanClient";
 import ckanExportAspectDef from "./ckanExportAspectDef";
 import URI from "urijs";
+import {max, min} from "lodash"
 
 interface PlainObjectType {
     [key: string]: any;
@@ -258,6 +259,55 @@ async function createCkanPackageDataFromDataset(
         data.notes = record?.aspects?.["dcat-dataset-strings"]?.["description"];
     }
 
+    const temporalCoverage: Array<any> = record.aspects['temporal-coverage'].intervals;
+    const startDates: Date[] = temporalCoverage.map((o: any) => o.start);
+    const endDates: Date[] = temporalCoverage.map((o: any) => o.end);
+    let temporalCoverageFrom: Date = min(startDates);
+    let temporalCoverageTo: Date = max(endDates);
+
+    const countryId = record.aspects['spatial-coverage']?.['lv1Id']
+    let country = null;
+    if(countryId) {
+        if(countryId === '1') {
+            country = "Australia (Mainland)"
+        } else if(countryId === "2") {
+            country = "Australian Offshore Remote Territories"
+        }
+    }
+    const updateFreq = record.aspects['dcat-dataset-strings']?.accrualPeriodicity;
+    const currency = record.aspects['currency'].status;
+    const language = record.aspects['dcat-dataset-strings']?.languages[0];
+
+    const extras: Array<{[key: string]: string}> = [
+        {
+            'key': 'temporal_coverage_from',
+            'value': temporalCoverageFrom,
+        },
+        {
+            'key': 'temporal_coverage_to',
+            'value': temporalCoverageTo,
+        },
+        {
+            'key': 'update_freq',
+            'value': updateFreq,
+        },
+        {
+            'key': 'currency',
+            'value': currency,
+        },
+        {
+            'key': 'spatial_coverage',
+            'value': country,
+        },
+        {
+            'key': 'language',
+            'value': language,
+        },
+    ];
+    data.extras = extras.filter((extra) => {
+        return extra.value !== undefined
+    });
+
     data.url = new URI(externalUrl)
         .path(`dataset/${record.id}/details`)
         .toString();
@@ -481,7 +531,9 @@ export default async function onRecordFound(
                 "dataset-distributions",
                 "temporal-coverage",
                 "dataset-publisher",
-                "provenance"
+                "provenance",
+                "currency",
+                "spatial-coverage"
             ],
             true
         );
