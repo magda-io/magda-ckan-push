@@ -320,6 +320,10 @@ class CkanClient {
         return uuidv4();
     }
 
+    static makeLicenseId(licenseName: string): string {
+        return licenseName.trim().toLowerCase();
+    }
+
     async searchLicense(licenseName: string) {
         const licenseList = await this.callCkanFunc<LicenseDataType[]>(
             "license_list"
