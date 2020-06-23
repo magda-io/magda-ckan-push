@@ -69,7 +69,7 @@ async function recordSuccessCkanExportAction(
         data,
         tenantId
     );
-    // console.log("Here is the result: ", res);
+    console.log("Done putting aspects");
     if (res instanceof Error) {
         throw Error;
     }
@@ -207,6 +207,7 @@ async function createCkanPackageDataFromDataset(
     externalUrl: string,
     record: Record
 ) {
+    console.log("Creating ckan data");
     const data = {
         name: await ckanClient.getAvailableCkanName(record.name),
         state: "active",
@@ -352,7 +353,6 @@ async function createCkanPackage(
         record
     );
 
-    // console.log("Done! Here is the data: ", data)
     console.log("Now creating ckan distribution from dataset...")
     const distributions = await createCkanDistributionsFromDataset(
         externalUrl,
@@ -384,6 +384,7 @@ async function updateCkanPackage(
         externalUrl,
         record
     );
+    console.log('Updating dataset with this data: ', data);
     const existingData = await ckanClient.getPackage(ckanId);
     const newData = {
         ...existingData,
