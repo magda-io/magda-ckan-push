@@ -1,0 +1,69 @@
+{
+  "name": "@magda/magda-minion-ckan-exporter",
+  "description": "MAGDA Minion for pushing to Ckan",
+  "version": "0.0.57-0",
+  "scripts": {
+    "prebuild": "rimraf dist tsconfig.tsbuildinfo",
+    "build": "yarn run compile",
+    "compile": "tsc -b",
+    "watch": "tsc -b --watch",
+    "start": "node dist/index.js",
+    "dev": "run-typescript-in-nodemon src/index.ts",
+    "dev-run": "ts-node -r tsconfig-paths/register",
+    "docker-build-local": "create-docker-context-for-node-component --build --push --tag auto --local",
+    "docker-build-prod": "create-docker-context-for-node-component --build --push --tag auto",
+    "test": "mocha --compilers ts:ts-node/register,tsx:ts-node/register --require tsconfig-paths/register \"src/test/**/*.spec.ts\"",
+    "retag-and-push": "retag-and-push",
+    "helm-lint": "helm lint deploy/magda-minion-ckan-exporter -f deploy/magda-minion-ckan-exporter/test-deploy.yaml"
+  },
+  "author": "CSIRO's Data61",
+  "license": "Apache-2.0",
+  "devDependencies": {
+    "@magda/scripts": "^0.0.57-0",
+    "@magda/typescript-common": "^0.0.57-0",
+    "@types/chai": "^4.0.4",
+    "@types/lodash": "^4.14.74",
+    "@types/mocha": "^2.2.42",
+    "@types/nock": "^8.2.1",
+    "@types/sinon": "^2.3.3",
+    "chai": "^4.1.1",
+    "lodash": "^4.17.4",
+    "mocha": "^3.5.0",
+    "nock": "^9.0.14",
+    "rimraf": "^3.0.2",
+    "sinon": "^3.2.1",
+    "typescript": "^3.7.2"
+  },
+  "dependencies": {
+    "@magda/minion-framework": "^0.0.57-0",
+    "@magda/minion-sdk": "^0.0.57-0-beta-3",
+    "@magda/registry-aspects": "^0.0.57-0",
+    "@types/isomorphic-fetch": "^0.0.35",
+    "@types/shortid": "^0.0.29",
+    "@types/urijs": "1.15.38",
+    "@types/uuid": "^7.0.2",
+    "lodash": "^4.17.4",
+    "shortid": "^2.2.15",
+    "urijs": "^1.19.2"
+  },
+  "config": {
+    "registryUrl": "http://localhost:6101/v0",
+    "docker": {
+      "name": "data61/magda-minion-ckan-exporter",
+      "include": "node_modules dist Dockerfile"
+    },
+    "jwtSecret": "squirrelsquirrelsquirrelsquirrel4s",
+    "userId": "00000000-0000-4000-8000-000000000000",
+    "externalUrl": "http://localhost"
+  },
+  "magda": {
+    "language": "typescript",
+    "categories": {
+      "minion": true
+    }
+  },
+  "_moduleMappings": {
+    "magda-typescript-common/src": "@magda/typescript-common/dist",
+    "magda-minion-framework/src": "@magda/minion-framework/dist"
+  }
+}

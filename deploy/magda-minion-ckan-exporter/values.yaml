@@ -1,0 +1,28 @@
+image:
+  name: "magda-minion-ckan-exporter"
+  # repository:
+  # tag:
+  # pullPolicy:
+  # imagePullSecret:
+
+global:
+  image: {}
+  rollingUpdate:
+    maxUnavailable: 0
+  minions:
+    image: {}
+
+resources:
+  requests:
+    cpu: 10m
+    memory: 30Mi
+  limits:
+    cpu: 100m
+
+defaultImage:
+  repository: docker.io/data61
+  tag: 0.0.57-0
+  pullPolicy: IfNotPresent
+  imagePullSecret: false
+
+defaultAdminUserId: "00000000-0000-4000-8000-000000000000"
