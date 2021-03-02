@@ -44,7 +44,7 @@
     "@types/uuid": "^7.0.2",
     "lodash": "^4.17.4",
     "shortid": "^2.2.15",
-    "urijs": "^1.19.2"
+    "urijs": "^1.19.6"
   },
   "config": {
     "registryUrl": "http://localhost:6101/v0",
