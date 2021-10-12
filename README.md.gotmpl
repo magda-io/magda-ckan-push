@@ -30,26 +30,10 @@ If you would like to build a connector or a minion for MAGDA,
 here is a handy
 [guide](https://github.com/magda-io/magda/blob/master/docs/docs/how-to-build-your-own-connectors-minions.md).
 
-## Requirements
+{{ template "chart.maintainersSection" . }}
 
-Kubernetes: `>= 1.14.0-0`
+{{ template "chart.requirementsSection" . }}
 
-| Repository | Name | Version |
-|------------|------|---------|
-| https://charts.magda.io | magda-common | 1.0.0-alpha.4 |
+{{ template "chart.valuesHeader" . }}
 
-## Values
-
-| Key | Type | Default | Description |
-|-----|------|---------|-------------|
-| defaultAdminUserId | string | `"00000000-0000-4000-8000-000000000000"` |  |
-| defaultImage.imagePullSecret | bool | `false` |  |
-| defaultImage.pullPolicy | string | `"IfNotPresent"` |  |
-| defaultImage.repository | string | `"docker.io/data61"` |  |
-| global.image | object | `{}` |  |
-| global.minions.image | object | `{}` |  |
-| global.rollingUpdate.maxUnavailable | int | `0` |  |
-| image.name | string | `"magda-minion-ckan-exporter"` |  |
-| resources.limits.cpu | string | `"100m"` |  |
-| resources.requests.cpu | string | `"10m"` |  |
-| resources.requests.memory | string | `"30Mi"` |  |
+{{ template "chart.valuesTable" . }}

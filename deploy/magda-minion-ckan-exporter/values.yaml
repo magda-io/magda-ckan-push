@@ -1,7 +1,6 @@
 image:
   name: "magda-minion-ckan-exporter"
   # repository:
-  # tag:
   # pullPolicy:
   # imagePullSecret:
 
@@ -21,7 +20,6 @@ resources:
 
 defaultImage:
   repository: docker.io/data61
-  tag: 0.0.57-0
   pullPolicy: IfNotPresent
   imagePullSecret: false
 
