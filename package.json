@@ -1,7 +1,7 @@
 {
   "name": "@magda/magda-minion-ckan-exporter",
   "description": "MAGDA Minion for pushing to Ckan",
-  "version": "0.0.57-0",
+  "version": "1.0.0",
   "scripts": {
     "prebuild": "rimraf dist tsconfig.tsbuildinfo",
     "build": "yarn run compile",
@@ -27,12 +27,12 @@
     "@magda/ci-utils": "^1.0.2",
     "@magda/docker-utils": "^0.0.60",
     "@types/chai": "^4.0.4",
+    "@types/isomorphic-fetch": "^0.0.35",
     "@types/lodash": "^4.14.74",
     "@types/mocha": "^2.2.42",
     "@types/nock": "^8.2.1",
-    "@types/sinon": "^2.3.3",
-    "@types/isomorphic-fetch": "^0.0.35",
     "@types/shortid": "^0.0.29",
+    "@types/sinon": "^2.3.3",
     "@types/uuid": "^7.0.2",
     "chai": "^4.1.1",
     "mocha": "^3.5.0",
@@ -47,10 +47,10 @@
     "@magda/minion-sdk": "^0.0.60",
     "@magda/registry-aspects": "^0.0.60",
     "isomorphic-fetch": "^2.2.1",
-    "uuid": "^3.4.0",
     "lodash": "^4.17.4",
     "shortid": "^2.2.15",
-    "urijs": "^1.19.2"
+    "urijs": "^1.19.2",
+    "uuid": "^3.4.0"
   },
   "config": {
     "registryUrl": "http://localhost:6101/v0",
