@@ -36,7 +36,7 @@ Kubernetes: `>= 1.14.0-0`
 
 | Repository | Name | Version |
 |------------|------|---------|
-| https://charts.magda.io | magda-common | 1.0.0-alpha.4 |
+| oci://ghcr.io/magda-io/charts | magda-common | 2.1.1 |
 
 ## Values
 
@@ -45,7 +45,7 @@ Kubernetes: `>= 1.14.0-0`
 | defaultAdminUserId | string | `"00000000-0000-4000-8000-000000000000"` |  |
 | defaultImage.imagePullSecret | bool | `false` |  |
 | defaultImage.pullPolicy | string | `"IfNotPresent"` |  |
-| defaultImage.repository | string | `"docker.io/data61"` |  |
+| defaultImage.repository | string | `"ghcr.io/magda-io"` |  |
 | global.image | object | `{}` |  |
 | global.minions.image | object | `{}` |  |
 | global.rollingUpdate.maxUnavailable | int | `0` |  |
