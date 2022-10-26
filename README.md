@@ -1,6 +1,6 @@
 # magda-minion-ckan-exporter
 
-MAGDA Minion for exporting datasets to CKAN
+MAGDA Minion for exporting datasets to CKAN test
 
 ## Description
 
