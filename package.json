@@ -1,7 +1,7 @@
 {
   "name": "@magda/magda-minion-ckan-exporter",
   "description": "MAGDA Minion for pushing to Ckan",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "scripts": {
     "prebuild": "rimraf dist tsconfig.tsbuildinfo",
     "build": "yarn run compile",
@@ -12,7 +12,7 @@
     "dev-run": "ts-node -r tsconfig-paths/register",
     "docker-build-local": "create-docker-context-for-node-component --build --push --tag auto --local",
     "docker-build-prod": "create-docker-context-for-node-component --build --push --tag auto",
-    "test": "mocha --compilers ts:ts-node/register,tsx:ts-node/register --require tsconfig-paths/register \"src/test/**/*.spec.ts\"",
+    "test": "mocha",
     "retag-and-push": "retag-and-push",
     "helm-lint": "helm lint deploy/magda-minion-ckan-exporter -f deploy/magda-minion-ckan-exporter/test-deploy.yaml",
     "helm-docs": "helm-docs -t ./README.md.gotmpl -o ../../README.md",
@@ -24,32 +24,31 @@
   "author": "CSIRO's Data61",
   "license": "Apache-2.0",
   "devDependencies": {
-    "@magda/ci-utils": "^1.0.2",
-    "@magda/docker-utils": "^0.0.60",
-    "@types/chai": "^4.0.4",
+    "@magda/ci-utils": "^1.0.5",
+    "@magda/docker-utils": "^2.1.1",
+    "@types/chai": "^4.3.3",
     "@types/isomorphic-fetch": "^0.0.35",
-    "@types/lodash": "^4.14.74",
-    "@types/mocha": "^2.2.42",
+    "@types/lodash": "^4.14.185",
+    "@types/mocha": "^9.1.1",
     "@types/nock": "^8.2.1",
     "@types/shortid": "^0.0.29",
     "@types/sinon": "^2.3.3",
     "@types/uuid": "^7.0.2",
-    "chai": "^4.1.1",
-    "mocha": "^3.5.0",
-    "nock": "^9.0.14",
+    "chai": "^4.3.6",
+    "mocha": "^10.0.0",
+    "nock": "^13.2.9",
     "rimraf": "^3.0.2",
     "sinon": "^3.2.1",
-    "ts-node": "^9.0.0",
-    "tsconfig-paths": "^3.9.0",
-    "typescript": "^3.9.5"
+    "ts-node": "^10.9.1",
+    "typescript": "^4.2.4"
   },
   "dependencies": {
-    "@magda/minion-sdk": "^0.0.60",
-    "@magda/registry-aspects": "^0.0.60",
+    "@magda/minion-sdk": "^2.1.1",
+    "@magda/registry-aspects": "^2.1.1",
     "isomorphic-fetch": "^2.2.1",
-    "lodash": "^4.17.4",
+    "lodash": "^4.17.21",
     "shortid": "^2.2.15",
-    "urijs": "^1.19.2",
+    "urijs": "^1.19.11",
     "uuid": "^3.4.0"
   },
   "config": {
@@ -67,9 +66,5 @@
     "categories": {
       "minion": true
     }
-  },
-  "_moduleMappings": {
-    "magda-typescript-common/src": "@magda/typescript-common/dist",
-    "magda-minion-framework/src": "@magda/minion-framework/dist"
   }
 }

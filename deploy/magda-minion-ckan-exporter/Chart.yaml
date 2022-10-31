@@ -1,7 +1,7 @@
 apiVersion: v2
 name: magda-minion-ckan-exporter
 description: A Helm chart for Magda CKAN Exporter Minion
-version: "1.0.0"
+version: "2.0.0"
 kubeVersion: ">= 1.14.0-0"
 home: "https://github.com/magda-io/magda-minion-ckan-exporter"
 sources: [ "https://github.com/magda-io/magda-minion-ckan-exporter" ]
@@ -9,5 +9,5 @@ annotations:
   magdaModuleType: "minion"
 dependencies:
   - name: magda-common
-    version: "1.0.0-alpha.4"
-    repository: "https://charts.magda.io"
+    version: "2.1.1"
+    repository: "oci://ghcr.io/magda-io/charts"
