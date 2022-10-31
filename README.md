@@ -30,6 +30,19 @@ If you would like to build a connector or a minion for MAGDA,
 here is a handy
 [guide](https://github.com/magda-io/magda/blob/master/docs/docs/how-to-build-your-own-connectors-minions.md).
 
+### Release Registry
+
+Since v2.0.0, we use [Github Container Registry](https://docs.github.com/en/packages/working-with-a-github-packages-registry/working-with-the-container-registry) as our official Helm Chart & Docker Image release registry.
+
+It's recommended to deploy minions with as [dependencies](https://helm.sh/docs/topics/chart_best_practices/dependencies/) of a Magda helm deployment.
+
+```yaml
+dependencies:
+  - name: magda-minion-ckan-exporter
+    version: "2.0.0"
+    repository: "oci://ghcr.io/magda-io/charts"
+```
+
 ## Requirements
 
 Kubernetes: `>= 1.14.0-0`
